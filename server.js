@@ -1,5 +1,6 @@
 // MODULES --
 require('dotenv').config()
+require('./db/db.js')
 const express = require('express')
 const app = express()
 
