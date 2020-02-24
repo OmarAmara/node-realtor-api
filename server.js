@@ -3,6 +3,8 @@ require('dotenv').config()
 require('./db/db.js')
 const express = require('express')
 const app = express()
+// models
+const Client = require('./models/client')
 
 // make Socket.io a different PORT
 const PORT = process.env.PORT
