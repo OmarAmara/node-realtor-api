@@ -5,6 +5,7 @@ const Realtor = require('../models/realtor')
 
 
 /* -- Realtor ROUTES -- */
+// Register Realtor Route
 router.post('/register', async (req, res, next) => {
 	try {
 		console.log('hit realtor register route');
@@ -44,6 +45,39 @@ router.post('/register', async (req, res, next) => {
 		}
 	} catch(err) {
 		// create custom error
+		next(err)
+	}
+})
+
+
+// Login Realtor Route
+router.post('/login', async (req, res, next) => {
+	try {
+		const realtor = await Realtor.findOne({ username: req.body.username.toLowerCase() })
+
+		if(!realtor) {
+			res.json("Invalid Username or Password")
+		} else {
+			// variable for bcrypt to compare to saves hashed password
+			console.log(realtor)
+			if(realtor.password === req.body.password) {
+				res.json("Realtor Successfully Logged In!")
+			} else {
+				res.json("Invalid Username or Password")
+			}
+		}
+	} catch(err) {
+		next(err)
+	}	
+})
+
+// Logout Realtor Route
+router.get('/logout', async (req, res, next) => {
+	try {
+		//await //destroy session data
+
+		res.json("Realtor Successfully Logged Out")
+	} catch(err) {
 		next(err)
 	}
 })
