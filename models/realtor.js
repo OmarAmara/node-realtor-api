@@ -34,7 +34,7 @@ const realtorSchema = mongoose.Schema({
 		},
 		phone: {
 			type: String,
-			minlenght: 10,
+			minlength: 10,
 			required: true
 		}
 	},
@@ -49,6 +49,7 @@ const realtorSchema = mongoose.Schema({
 		},
 		phoneNumber: {
 			type: String,
+			minlength: 10,
 			required: true
 		},
 		email: {

@@ -13,7 +13,7 @@ router.get('/', async (req, res, next) => {
 // Register Client Route
 router.post('/register', async (req, res, next) => {
 	try {
-		console.log('hit client post route');
+		console.log('hit client register route');
 
 		const desiredEmail = req.body.email.toLowerCase()
 		const desiredUsername = req.body.username.toLowerCase()
@@ -32,6 +32,7 @@ router.post('/register', async (req, res, next) => {
 		 	// 	data={"taken" : "Client Already Exists"},
 		 	// 	status=200 
 		 	// )
+		 	// use req.body to keep casing
 			res.json(`Username: ${req.body.username} or Email: ${req.body.email} Already Exists. Try a different Username or Email`)
 		} else {
 		 	console.log('Client Does Not Exist')
@@ -44,7 +45,7 @@ router.post('/register', async (req, res, next) => {
 		 		firstName: req.body.firstName,
 		 		lastName: req.body.lastName,
 		 		// this portion will change when front end utilizes drop down of three options in model.
-		 		recoveryQuestion: ["Where were you born?"],
+		 		recoveryQuestion: [`${req.body.recoveryQuestion}`],
 		 		recoveryAnswer: req.body.recoveryAnswer,
 		 	})
 			res.json(createdClient)
