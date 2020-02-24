@@ -55,6 +55,7 @@ router.post('/register', async (req, res, next) => {
 	}
 })
 
+// Login Client Route
 router.post('/login', async (req, res, next) => {
 	try {
 		const client = await Client.findOne({ email: req.body.email })
@@ -70,6 +71,17 @@ router.post('/login', async (req, res, next) => {
 				res.json("Invalid Username or Password")
 			}
 		}
+	} catch(err) {
+		next(err)
+	}
+})
+
+// Logout Client Route
+router.get('/logout', async (req, res, next) => {
+	try {
+		//await //destroy session data
+
+		res.json("Client Successfully Logged Out")
 	} catch(err) {
 		next(err)
 	}
