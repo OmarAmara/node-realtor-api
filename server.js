@@ -21,8 +21,12 @@ app.use(express.json()) // utilize json data from request.body
 
 
 /* -- CONTROLLERS -- */
+// Client
 const clientAuthController = require('./controllers/clientAuthController')
 app.use('/api/v1.0/clients', clientAuthController)
+// Realtor
+const realtorAuthController = require('./Controllers/realtorAuthController')
+app.use('/api/v1.0/realtors', realtorAuthController)
 
 
 /* -- ROUTES -- */

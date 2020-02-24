@@ -4,7 +4,7 @@ const router = express.Router()
 const Client = require('../models/client')
 
 
-/* -- ROUTES -- */
+/* -- Client ROUTES -- */
 // test route
 router.get('/', async (req, res, next) => {
 	res.json(data={ greet: 'hello' })

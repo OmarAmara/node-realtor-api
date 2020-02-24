@@ -7,15 +7,30 @@ const realtorSchema = mongoose.Schema({
 		lowercase: true
 	},
 	company: {
-		name: String,
-		required: true,
-		location: {
-			street1: String,
-			street2: String,
-			city: String,
-			state: String,
-			zipcode: String,
+		name: {
+			type: String,
 			required: true
+		},
+		location: {
+			street1: {
+				type: String
+				//, required: true
+			},
+			street2: {
+				type: String
+			},
+			city: {
+				type: String,
+				required: true
+			},
+			state: {
+				type: String,
+				required: true
+			},
+			zipcode: {
+				type: String,
+				required: true
+			}
 		},
 		phone: {
 			type: String,
@@ -24,7 +39,11 @@ const realtorSchema = mongoose.Schema({
 		}
 	},
 	contactInfo: {
-		fullname: {
+		firstName: {
+			type: String,
+			required: true
+		},
+		lastName: {
 			type: String,
 			required: true
 		},
