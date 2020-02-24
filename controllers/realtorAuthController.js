@@ -60,8 +60,16 @@ router.post('/login', async (req, res, next) => {
 		} else {
 			// variable for bcrypt to compare to saves hashed password
 			console.log(realtor)
+			// const data = {realtorId: realtor.id, company: realtor.company, contactInfo: realtor.contactInfo, clients: realtor.clients, username: realtor.username, websiteURL: realtor.websiteURL, brokerLicenseNumber: realtor.brokerLicenseNumber}
 			if(realtor.password === req.body.password) {
-				res.json("Realtor Successfully Logged In!")
+				// spread destructorer, but gives too much info
+				// const { password, ...noPassword } = realtor console.log(noPassword)
+				realtor.password = null
+				res.json({
+					data: realtor, 
+					message: "Realtor Successfully Logged In!", 
+					status: 201
+				})
 			} else {
 				res.json("Invalid Username or Password")
 			}
