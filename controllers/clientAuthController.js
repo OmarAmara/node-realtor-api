@@ -3,53 +3,78 @@ const router = express.Router()
 // models
 const Client = require('../models/client')
 
-// require client model...other applicable
 
+/* -- ROUTES -- */
+// test route
 router.get('/', async (req, res, next) => {
 	res.json(data={ greet: 'hello' })
 })
 
-router.post('/', async (req, res, next) => {
-	try{
+// Register Client Route
+router.post('/register', async (req, res, next) => {
+	try {
 		console.log('hit client post route');
 
-		 const desiredEmail = req.body.email.toLowerCase()
-		 const desiredUsername = req.body.username.toLowerCase()
-		 const desiredPassword = req.body.password
+		const desiredEmail = req.body.email.toLowerCase()
+		const desiredUsername = req.body.username.toLowerCase()
+		const desiredPassword = req.body.password
 
-		 const clientExists = await Client.findOne({
+		const clientExists = await Client.findOne({
 		 	$or: [
-			 	{email: desiredEmail},
-			 	{username: desiredUsername}
-
+				{email: desiredEmail},
+				{username: desiredUsername}
 		 	]
-		 })
+		})
 
-		 if(clientExists) {
-		 	res.json('Client Already Exists')
-		 } else {
+		if(clientExists) {
+		 	// deprecated warning
+		 	// res.json(
+		 	// 	data={"taken" : "Client Already Exists"},
+		 	// 	status=200 
+		 	// )
+			res.json(`Username: ${req.body.username} or Email: ${req.body.email} Already Exists. Try a different Username or Email`)
+		} else {
 		 	console.log('Client Does Not Exist')
 		 	console.log('\n', req.body)
-		 	// res.json(desiredEmail)
 		 	// should be hashing password here
-		 	 const createdClient = await Client.create({
-		 	 	email: desiredEmail,
-		 	 	username: desiredUsername,
-		 	 	password: desiredPassword,
-		 	 	firstName: req.body.firstName,
-		 	 	lastName: req.body.lastName,
-		 	 	recoveryQuestion: ["Where were you born?"],
-		 	 	recoveryAnswer: req.body.recoveryAnswer,
-		 	 })
-		 	 res.json(createdClient)
-
-		 }
-		// console.log(req.body);
-		// res.json(req.body.name + " is a good name")
+		 	const createdClient = await Client.create({
+		 		email: desiredEmail,
+		 		username: desiredUsername,
+		 		password: desiredPassword,
+		 		firstName: req.body.firstName,
+		 		lastName: req.body.lastName,
+		 		// this portion will change when front end utilizes drop down of three options in model.
+		 		recoveryQuestion: ["Where were you born?"],
+		 		recoveryAnswer: req.body.recoveryAnswer,
+		 	})
+			res.json(createdClient)
+		}
 	} catch(err) {
 		// try creating custom error --> (console.error) or respond with if status ===... res.json(...)
 		next(err)
 	}
 })
+
+router.post('/login', async (req, res, next) => {
+	try {
+		const client = await Client.findOne({ email: req.body.email })
+
+		if(!client) {
+			res.json("Invalid Username or Password")
+		} else {
+			// variable for bcrypt to compare to saves hashed password
+			console.log(client)
+			if(client.password === req.body.password) {
+				res.json("Logged In!")
+			} else {
+				res.json("Invalid Username or Password")
+			}
+		}
+	} catch(err) {
+		next(err)
+	}
+})
+
+
 
 module.exports = router
