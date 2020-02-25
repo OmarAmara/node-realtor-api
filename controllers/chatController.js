@@ -28,11 +28,11 @@ router.get('/', async (req, res, next) => {
 				 convo.client.recoveryAnswer = null
 				 convo.realtor.password = null
 			})
-			res.json({
+			res.status(200).json({
 				data: conversations,
 				message: `Retrieved ${conversations.length} Conversations`,
 				status: 200
-			}), 200
+			})
 			// conversations.messages.forEach(message => console.log(message))
 		} else {
 			const conversations = await Chat.find({
@@ -45,11 +45,11 @@ router.get('/', async (req, res, next) => {
 				convo.client.recoveryAnswer = null
 				convo.realtor.password = null
 			})
-			res.json({
+			res.status(200).json({
 				data: conversations,
 				message: `Retrieved ${conversations.length} Conversations`,
 				status: 200
-			}), 200
+			})
 		}
 	} catch(err) {
 		next(err)
@@ -89,57 +89,56 @@ router.post('/messages/:chatId/', async (req, res, next) => {
 // Delete Chat Message Route
 router.delete('/:chatId/:messageId', async (req, res, next) => {
 	try {
-		// ADD VERIFICATION THAT MESSAGE IS USER's
 		const foundChat = await Chat.findById(req.params.chatId)
-		if(req.session.isClient && req.session.loggedInUser._id === foundChat.client.toString()) {
-			console.log("you are the client here!");
-			console.log('foundChat before delete: ', foundChat);
 
+		// check if user attempting to delete is the client
+		if(req.session.isClient && req.session.loggedInUser._id === foundChat.client.toString()) {
+
+			// Insures that participant can only delete their message and not other participant
 			if(foundChat.messages.id(req.params.messageId).isSenderClient === true) {
-				// foundChat.messages.id(req.params.messageId).remove()
-				console.log('foundChat after delete message: ', foundChat);
-				console.log('looks like we make it');
-				// await foundChat.save()
-			} else {			
-				res.json({
-					data: {},
-					message: "You must be the message's owner to delete or modify.",
-					status: 401
-				}), 401
+				foundChat.messages.id(req.params.messageId).remove()
+
+				await foundChat.save()
+				res.status(200).json({
+					data: foundChat,
+					message: "Successfully deleted message",
+					status: 200
+				})
 			}
-		// foundChat.isSenderClient ? foundChat.messages.id(req.params.messageId).remove() : res.json('really now?')
-		}
-		
-		if(req.session.isClient === false && req.session.loggedInUser._id === foundChat.realtor.toString()) {
-			console.log('you are the realtor, buddy!');
+		// simplify to ternary?: foundChat.isSenderClient ? foundChat.messages.id(req.params.messageId).remove() : res.json('really now?')
+
+		// check if user attempting to delete is the realtor	
+		} else if(req.session.isClient === false && req.session.loggedInUser._id === foundChat.realtor.toString()) {
+
+			// Insures that participant can only delete their message and not other participant
 			if(foundChat.messages.id(req.params.messageId).isSenderClient === false) {
-				// foundChat.messages.id(req.params.messageId).remove()
-				console.log('Looks like you made the cut realtor!');
+				foundChat.messages.id(req.params.messageId).remove()
+
+				await foundChat.save()
+				res.status(200).json({
+					data: foundChat,
+					message: "Successfully deleted message",
+					status: 200
+				})
 			} else {
-				res.json({
+				res.status(401).json({
 					data: {},
 					message: "You must be the message's owner to delete or modify.",
 					status: 401
 				}), 401
 			}
 		} else(
-			res.json({
+			res.status(401).json({
 				data: {},
-				message: 'User id does not match with participant in chat.',
+				message: 'User id in message does not match with participant in chat. You must be the ownner of the message you are trying to delete.',
 				status: 401
-			}), 401
+			})
 		)
-
-		// chat.id: 5e54c73cddfb8d4bacfa0da1
-		// message in chat: 5e555d49d42e73544079034e
-
-		// res.json(foundChat)
 
 	} catch(err) {
 		next(err)
 	}	
 })
-
 
 
 // Create Chat thread Route
@@ -156,9 +155,11 @@ router.post('/:realtorId', isClientAuth, async (req, res, next) => {
 				messages: []
 			})
 			console.log(createdChat);
-			res.json(
-				createdChat
-			)
+			res.status(200).json({
+				data: createdChat,
+				message: "Successfully Started New Chat Thread",
+				status: 200
+			})
 		} else {
 			res.json(`You have an existing thread with this Realtor!: ${convoWithRealtor.messages}`)
 		}
