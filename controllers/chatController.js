@@ -20,24 +20,26 @@ router.get('/', async (req, res, next) => {
 				client: req.session.loggedInUser._id 
 			}).populate('messages._id').populate('client').populate('realtor')
 			//--> Front-end will have to loop all conversation and then messages!
-				conversations.forEach((convo)=>{
-					convo.client.password = null
-					convo.client.recoveryQuestion = null
-					convo.client.recoveryAnswer = null
-					convo.realtor.password = null
-				})
+			// remove sensitive information
+			conversations.forEach((convo)=>{
+				convo.client.password = null
+				convo.client.recoveryQuestion = null
+				convo.client.recoveryAnswer = null
+				convo.realtor.password = null
+			})
 			res.json(`Found ${conversations.length} convos: ${conversations}`)
 			// conversations.messages.forEach(message => console.log(message))
 		} else {
 			const conversations = await Chat.find({
 				realtor: req.session.loggedInUser._id
 			}).populate('messages').populate('client').populate('realtor')
-				conversations.forEach((convo)=>{
-					convo.client.password = null
-					convo.client.recoveryQuestion = null
-					convo.client.recoveryAnswer = null
-					convo.realtor.password = null
-				})
+			// remove sensitive information
+			conversations.forEach((convo)=>{
+				convo.client.password = null
+				convo.client.recoveryQuestion = null
+				convo.client.recoveryAnswer = null
+				convo.realtor.password = null
+			})
 			res.json(`Found ${conversations.length} convos: ${conversations}`)	
 		}
 	} catch(err) {
@@ -76,11 +78,22 @@ router.post('/messages/:chatId/', async (req, res, next) => {
 })
 
 
+// Delete Chat Message Route
+router.delete('/:chatId/:messageId', async (req, res, next) => {
+	try {
+		const foundChat = await Chat.findById(req.params.chatId)
+		
+
+	} catch(err) {
+		next(err)
+	}	
+})
+
+
 
 // Create Chat thread Route
 router.post('/:realtorId', isClientAuth, async (req, res, next) => {
 	try {
-		console.log(req.body);
 		const convoWithRealtor = await Chat.find({ $and: [{client: req.session.loggedInUser._id, realtor: req.params.realtorId}] }).populate('client').populate('realtor')
 		console.log(convoWithRealtor);
 		if(convoWithRealtor.length < 1) {
