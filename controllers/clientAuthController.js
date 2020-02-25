@@ -39,8 +39,6 @@ router.post('/register', async (req, res, next) => {
 		 	// use req.body to keep casing
 			res.json(`Username: ${req.body.username} or Email: ${req.body.email} Already Exists. Try a different Username or Email`)
 		} else {
-		 	console.log('Client Does Not Exist')
-		 	console.log('\n', req.body)
 		 	// should be hashing password here
 		 	const createdClient = await Client.create({
 		 		email: desiredEmail,
@@ -56,7 +54,7 @@ router.post('/register', async (req, res, next) => {
 			createdClient.recoveryQuestion = null
 			createdClient.recoveryAnswer = null
 	 		// create cookie
-			req.session.loggedInUser = client
+			req.session.loggedInUser = createdClient
 			req.session.isClient = true
 
 			res.status(200).json({
@@ -137,6 +135,9 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 			console.log(foundRealtor)
 			// ^^ Everything above functions as intended.
 
+			// error due to value of object being casted to string as defined in client model...
+			foundRealtor.password = null
+			foundRealtor.clients = null
 			const currentRealtor = {
 				currentRealtor: foundRealtor
 			}

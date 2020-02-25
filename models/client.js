@@ -53,9 +53,7 @@ const clientSchema = mongoose.Schema({
 		maxlength: 9
 	},
 	// this will hold id of current realtor. Can only have 1 realtor at a time.
-	currentRealtor: {
-		type: String
-	},
+	currentRealtor: [],
 	// this will hold history of realtors.
 	realtorsWorkedWith: []
 })
