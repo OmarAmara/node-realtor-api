@@ -17,7 +17,6 @@ router.get('/', async (req, res, next) => {
 // Register Client Route
 router.post('/register', async (req, res, next) => {
 	try {
-		console.log('hit client register route');
 
 		const desiredEmail = req.body.email.toLowerCase()
 		const desiredUsername = req.body.username.toLowerCase()
@@ -72,13 +71,12 @@ router.post('/register', async (req, res, next) => {
 // Login Client Route
 router.post('/login', async (req, res, next) => {
 	try {
-		const client = await Client.findOne({ email: req.body.email })
+		const client = await Client.findOne({ email: req.body.email }).populate('currentRealtor.contactInfo._id')
 
 		if(!client) {
 			res.json("Invalid Username or Password")
 		} else {
 			// variable for bcrypt to compare to saves hashed password
-			console.log(client)
 			if(client.password === req.body.password) {
 				client.password = null
 				client.recoveryQuestion = null
@@ -120,16 +118,13 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 	try {
 
 		const foundRealtor = await Realtor.findById(req.params.realtorId)
-		console.log('THIS IS FOUNDREALTOR: ', foundRealtor)
 
 		let clientExists = false
 		foundRealtor.clients.forEach((client) => {
 			if (client.email === req.session.loggedInUser.email) {
 				clientExists = true
-				console.log('READ THIS, PRINTING CLIENT.EMAIL in .forEACH: ', client.email)
 			}
 		})
-		console.log('\n\n\nclientExists: ', clientExists)
 
 		if(clientExists === false) {
 
@@ -137,14 +132,10 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 			client.password = null
 			client.recoveryAnswer = null
 			client.recoveryQuestion = null
-			console.log('The client being added to realtor arr: ', client)
 
 			foundRealtor.clients.push(client)
 			await foundRealtor.save()
-			console.log('foundRealtor after save: ', foundRealtor)
-			// ^^ Everything above functions as intended.
 
-			// error due to value of object being casted to string as defined in client model...
 			foundRealtor.password = null
 			foundRealtor.clients = null
 			const currentRealtor = {
@@ -156,7 +147,6 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 			updateCurrentClient.currentRealtor = foundRealtor
 
 			await updateCurrentClient.save()
-			console.log('updatedCurrentClient after save: ', updateCurrentClient)
 
 			res.status(200).json({
 			 	data: foundRealtor,
@@ -164,15 +154,12 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 			 	status: 200
 			})
 		} else{
-			console.log('***CHECK DB to see if this is true, that clientExists in .forEach above. clientExists: ', clientExists)
 			res.status(400).json({
 				data: {},
-				message: "Something went wrong",
+				message: `Client is already contracted with Realtor ${req.session.loggedInUser.currentRealtor[0].contactInfo.firstName + ` ` + req.session.loggedInUser.currentRealtor[0].contactInfo.lastName}. Are you trying to switch realtors? You can contact ${req.session.loggedInUser.currentRealtor[0].contactInfo.firstName} at ${req.session.loggedInUser.currentRealtor[0].contactInfo.email} or feel free to contact support at thereIs@noSupport.com`,
 				status: 400
 			})
 		}
-
-
 	} catch(err) {
 		next(err)
 	}

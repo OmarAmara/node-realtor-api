@@ -8,8 +8,6 @@ const Realtor = require('../models/realtor')
 // Register Realtor Route
 router.post('/register', async (req, res, next) => {
 	try {
-		console.log('hit realtor register route');
-
 		const desiredUsername = req.body.username.toLowerCase()
 		const licenseNumber = req.body.brokerLicenseNumber
 		const desiredPassword = req.body.password
@@ -25,8 +23,6 @@ router.post('/register', async (req, res, next) => {
 			// use req.body to keep casing
 			res.json(`Username: ${req.body.username} or Realtor Brokerage License Already Exists. Try a different Username or check License Number`)
 		} else {
-		 	console.log('Realtor Does Not Exist')
-		 	console.log('\n', req.body)
 		 	// should be hashing password here
 		 	const createdRealtor = await Realtor.create({
 		 		// GREAT PLACE TO USE SPREAD OPERATOR?
