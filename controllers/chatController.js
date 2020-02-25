@@ -20,10 +20,23 @@ router.get('/', async (req, res, next) => {
 
 router.post('/:realtorId', isClientAuth, async (req, res, next) => {
 	try {
+		console.log(req.body);
 		const convoWithRealtor = await Chat.find({ $and: [{client: req.session.loggedInUser._id, realtor: req.params.realtorId}] })
 		console.log(convoWithRealtor);
-		if(!convoWithRealtor) {
+		if(convoWithRealtor.length < 1) {
+			// res.json('lets create a convo!')
 
+			const createdChat = await Chat.create({
+				client: req.session.loggedInUser._id,
+				realtor: req.params.realtorId,
+				messages: []
+			})
+			console.log(createdChat);
+			res.json(
+				createdChat
+			)
+		} else {
+			res.json(`You have an existing thread with this Realtor!: ${convoWithRealtor.messages}`)
 		}
 	} catch(err) {
 		next(err)
