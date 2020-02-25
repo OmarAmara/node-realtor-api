@@ -123,18 +123,26 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 
 		const foundRealtor = await Realtor.findById(req.params.realtorId)
 
-		let client = req.session.loggedInUser
-		client.password = null
-		client.recoveryAnswer = null
-		client.recoveryQuestion = null
-		console.log(client)
 
 		if(req.session.loggedInUser.currentRealtor !== foundRealtor) {
 
-			foundRealtor.clients.push(client)
+			let client = req.session.loggedInUser
+			client.password = null
+			client.recoveryAnswer = null
+			client.recoveryQuestion = null
+			console.log(client)
 
+			foundRealtor.clients.push(client)
 			await foundRealtor.save()
-			
+			console.log(foundRealtor)
+			// ^^ Everything above functions as intended.
+
+			const currentRealtor = {
+				currentRealtor: foundRealtor
+			}
+
+			const updateCurrentClient = await Client.findByIdAndUpdate(req.session.loggedInUser._id, currentRealtor)
+			console.log(updateCurrentClient)
 		}
 
 
