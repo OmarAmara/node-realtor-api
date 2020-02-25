@@ -5,6 +5,7 @@ const isClientAuth = require('../lib/isClientAuth')
 
 // models
 const Client = require('../models/client')
+const Realtor = require('../models/realtor')
 
 
 /* -- Client ROUTES -- */
@@ -116,9 +117,26 @@ router.get('/logout', async (req, res, next) => {
 
 
 // Contract Realtor/Client Relationship
-router.get('/contract/:realtorId', isClientAuth, async (req, res, next) => {
+//** In future, Make this so hitting route will notify realtor and relationship will only commence once realtor confirms...
+router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 	try {
+
 		const foundRealtor = await Realtor.findById(req.params.realtorId)
+
+		let client = req.session.loggedInUser
+		client.password = null
+		client.recoveryAnswer = null
+		client.recoveryQuestion = null
+		console.log(client)
+
+		if(req.session.loggedInUser.currentRealtor !== foundRealtor) {
+
+			foundRealtor.clients.push(client)
+
+			await foundRealtor.save()
+			
+		}
+
 
 	} catch(err) {
 		next(err)

@@ -101,6 +101,9 @@ router.get('/logout', async (req, res, next) => {
 })
 
 
+//CLIENT SEARCH INDEX WILL GO HERE//:
+
+
 // Terminate Realtor/Client Relationship
 //router.get('/terminate')
 
