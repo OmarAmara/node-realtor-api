@@ -8,11 +8,38 @@ const Chat = require('../models/chat')
 
 
 /* -- Chat ROUTES -- */
+
+// Index Chat/ message Route
+// Find a DRYer way here:
 router.get('/', async (req, res, next) => {
 	try {
 		console.log(req.session.loggedInUser._id);
-		const conversations = await Chat.find({client: req.session.loggedInUser._id})
-		res.json(`Found ${conversations.length} convos: ${conversations}`)	
+
+		if(req.session.isClient) {
+			const conversations = await Chat.find({
+				client: req.session.loggedInUser._id 
+			}).populate('messages._id').populate('client').populate('realtor')
+			//--> Front-end will have to loop all conversation and then messages!
+				conversations.forEach((convo)=>{
+					convo.client.password = null
+					convo.client.recoveryQuestion = null
+					convo.client.recoveryAnswer = null
+					convo.realtor.password = null
+				})
+			res.json(`Found ${conversations.length} convos: ${conversations}`)
+			// conversations.messages.forEach(message => console.log(message))
+		} else {
+			const conversations = await Chat.find({
+				realtor: req.session.loggedInUser._id
+			}).populate('messages').populate('client').populate('realtor')
+				conversations.forEach((convo)=>{
+					convo.client.password = null
+					convo.client.recoveryQuestion = null
+					convo.client.recoveryAnswer = null
+					convo.realtor.password = null
+				})
+			res.json(`Found ${conversations.length} convos: ${conversations}`)	
+		}
 	} catch(err) {
 		next(err)
 	}
@@ -54,7 +81,7 @@ router.post('/messages/:chatId/', async (req, res, next) => {
 router.post('/:realtorId', isClientAuth, async (req, res, next) => {
 	try {
 		console.log(req.body);
-		const convoWithRealtor = await Chat.find({ $and: [{client: req.session.loggedInUser._id, realtor: req.params.realtorId}] })
+		const convoWithRealtor = await Chat.find({ $and: [{client: req.session.loggedInUser._id, realtor: req.params.realtorId}] }).populate('client').populate('realtor')
 		console.log(convoWithRealtor);
 		if(convoWithRealtor.length < 1) {
 			// res.json('lets create a convo!')
