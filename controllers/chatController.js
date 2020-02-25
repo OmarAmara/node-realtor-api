@@ -11,6 +11,7 @@ const Chat = require('../models/chat')
 
 // Index Chat/ message Route
 // Find a DRYer way here:
+// Why do message id's return as null?
 router.get('/', async (req, res, next) => {
 	try {
 		console.log(req.session.loggedInUser._id);
@@ -18,21 +19,25 @@ router.get('/', async (req, res, next) => {
 		if(req.session.isClient) {
 			const conversations = await Chat.find({
 				client: req.session.loggedInUser._id 
-			}).populate('messages._id').populate('client').populate('realtor')
+			 }).populate('messages._id').populate('client').populate('realtor')
 			//--> Front-end will have to loop all conversation and then messages!
 			// remove sensitive information
 			conversations.forEach((convo)=>{
-				convo.client.password = null
-				convo.client.recoveryQuestion = null
-				convo.client.recoveryAnswer = null
-				convo.realtor.password = null
+				 convo.client.password = null
+				 convo.client.recoveryQuestion = null
+				 convo.client.recoveryAnswer = null
+				 convo.realtor.password = null
 			})
-			res.json(`Found ${conversations.length} convos: ${conversations}`)
+			res.json({
+				data: conversations,
+				message: `Retrieved ${conversations.length} Conversations`,
+				status: 200
+			}), 200
 			// conversations.messages.forEach(message => console.log(message))
 		} else {
 			const conversations = await Chat.find({
 				realtor: req.session.loggedInUser._id
-			}).populate('messages').populate('client').populate('realtor')
+			}).populate('messages._id').populate('client').populate('realtor')
 			// remove sensitive information
 			conversations.forEach((convo)=>{
 				convo.client.password = null
@@ -40,7 +45,8 @@ router.get('/', async (req, res, next) => {
 				convo.client.recoveryAnswer = null
 				convo.realtor.password = null
 			})
-			res.json(`Found ${conversations.length} convos: ${conversations}`)	
+			// res.json(`Found ${conversations.length} convos: ${conversations}`)	
+			res.json(conversations)
 		}
 	} catch(err) {
 		next(err)
@@ -81,8 +87,17 @@ router.post('/messages/:chatId/', async (req, res, next) => {
 // Delete Chat Message Route
 router.delete('/:chatId/:messageId', async (req, res, next) => {
 	try {
+		// ADD VERIFICATION THAT MESSAGE IS USER's
 		const foundChat = await Chat.findById(req.params.chatId)
-		
+		console.log('foundChat before delete: ', foundChat);
+		foundChat.messages.id(req.params.messageId).remove()
+		console.log('foundChat after delete message: ', foundChat);
+		await foundChat.save()
+
+		res.json(foundChat)
+
+		// chat.id: 5e54c73cddfb8d4bacfa0da1
+
 
 	} catch(err) {
 		next(err)
