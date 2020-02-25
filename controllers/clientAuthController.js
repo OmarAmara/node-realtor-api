@@ -55,7 +55,11 @@ router.post('/register', async (req, res, next) => {
 			req.session.loggedInUser = client
 			req.session.isClient = true
 
-			res.json(createdClient)
+			res.status.(200).json({
+				data: createdClient,
+				message: "Successfully Registered New Account",
+				status: 200
+			})
 		}
 	} catch(err) {
 		// try creating custom error --> (console.error) or respond with if status ===... res.json(...)
@@ -82,7 +86,7 @@ router.post('/login', async (req, res, next) => {
 				req.session.loggedInUser = client
 				req.session.isClient = true
 
-				res.json({
+				res.status(201).json({
 					data: client, 
 					message: "Client Successfully Logged In!", 
 					status: 201

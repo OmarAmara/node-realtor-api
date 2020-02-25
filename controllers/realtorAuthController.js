@@ -75,7 +75,7 @@ router.post('/login', async (req, res, next) => {
 				req.session.loggedInUser = realtor
 				req.session.isClient = false
 
-				res.json({
+				res.status(201).json({
 					data: realtor, 
 					message: "Realtor Successfully Logged In!", 
 					status: 201
