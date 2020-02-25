@@ -40,6 +40,11 @@ router.post('/register', async (req, res, next) => {
 		 		// recoveryQuestion: [`req.body.recoveryQuestion`],
 		 		// recoveryAnswer: req.body.recoveryAnswer,
 		 	})
+		 	createdRealtor.password = null
+
+			// session cookie
+			req.session.loggedInUser = realtor
+			req.session.isClient = false
 
 			res.json(createdRealtor)
 		}
@@ -68,6 +73,8 @@ router.post('/login', async (req, res, next) => {
 
 				// session cookie
 				req.session.loggedInUser = realtor
+				req.session.isClient = false
+
 				res.json({
 					data: realtor, 
 					message: "Realtor Successfully Logged In!", 

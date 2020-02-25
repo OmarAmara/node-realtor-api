@@ -26,9 +26,17 @@ router.post('/messages/:chatId/', async (req, res, next) => {
 		console.log('foundChat: ', foundChat);
 		console.log(foundChat.client);
 
-		if(foundChat.client.toString() === req.session.loggedInUser._id) {
+		if(foundChat.client.toString() === req.session.loggedInUser._id || foundChat.realtor.toString() === req.session.loggedInUser._id) {
+			const loggedInUserMessage = {
+				body: req.body.body,
+				// test this with realtor loggedIn
+				isSenderClient: req.session.isClient
+			}
+
+			foundChat.messages.push(loggedInUserMessage)
+			await foundChat.save()
 			res.json(
-				"I work, now add message to story id, use boolean!"
+				`foundChat: ${foundChat}`
 			)
 		} else {
 			res.json("Some logic went wrong.")

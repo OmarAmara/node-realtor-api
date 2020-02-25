@@ -48,6 +48,13 @@ router.post('/register', async (req, res, next) => {
 		 		recoveryQuestion: [`${req.body.recoveryQuestion}`],
 		 		recoveryAnswer: req.body.recoveryAnswer,
 		 	})
+		 	createdClient.password = null
+			createdClient.recoveryQuestion = null
+			createdClient.recoveryAnswer = null
+	 		// create cookie
+			req.session.loggedInUser = client
+			req.session.isClient = true
+
 			res.json(createdClient)
 		}
 	} catch(err) {
