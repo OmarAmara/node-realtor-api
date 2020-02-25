@@ -45,8 +45,11 @@ router.get('/', async (req, res, next) => {
 				convo.client.recoveryAnswer = null
 				convo.realtor.password = null
 			})
-			// res.json(`Found ${conversations.length} convos: ${conversations}`)	
-			res.json(conversations)
+			res.json({
+				data: conversations,
+				message: `Retrieved ${conversations.length} Conversations`,
+				status: 200
+			}), 200
 		}
 	} catch(err) {
 		next(err)
@@ -54,12 +57,11 @@ router.get('/', async (req, res, next) => {
 })
 
 
-// Create Message Route
+// Create Message in chat Route
 router.post('/messages/:chatId/', async (req, res, next) => {
 	try {
 		const foundChat = await Chat.findById(req.params.chatId)
 		console.log('foundChat: ', foundChat);
-		console.log(foundChat.client);
 
 		if(foundChat.client.toString() === req.session.loggedInUser._id || foundChat.realtor.toString() === req.session.loggedInUser._id) {
 			const loggedInUserMessage = {
@@ -74,7 +76,7 @@ router.post('/messages/:chatId/', async (req, res, next) => {
 				`foundChat: ${foundChat}`
 			)
 		} else {
-			res.json("Some logic went wrong.")
+			res.json("You must be a realtor?")
 			console.log(foundChat.client + " " + req.session.loggedInUser._id);
 		}
 
@@ -89,15 +91,49 @@ router.delete('/:chatId/:messageId', async (req, res, next) => {
 	try {
 		// ADD VERIFICATION THAT MESSAGE IS USER's
 		const foundChat = await Chat.findById(req.params.chatId)
-		console.log('foundChat before delete: ', foundChat);
-		foundChat.messages.id(req.params.messageId).remove()
-		console.log('foundChat after delete message: ', foundChat);
-		await foundChat.save()
+		if(req.session.isClient && req.session.loggedInUser._id === foundChat.client.toString()) {
+			console.log("you are the client here!");
+			console.log('foundChat before delete: ', foundChat);
 
-		res.json(foundChat)
+			if(foundChat.messages.id(req.params.messageId).isSenderClient === true) {
+				// foundChat.messages.id(req.params.messageId).remove()
+				console.log('foundChat after delete message: ', foundChat);
+				console.log('looks like we make it');
+				// await foundChat.save()
+			} else {			
+				res.json({
+					data: {},
+					message: "You must be the message's owner to delete or modify.",
+					status: 401
+				}), 401
+			}
+		// foundChat.isSenderClient ? foundChat.messages.id(req.params.messageId).remove() : res.json('really now?')
+		}
+		
+		if(req.session.isClient === false && req.session.loggedInUser._id === foundChat.realtor.toString()) {
+			console.log('you are the realtor, buddy!');
+			if(foundChat.messages.id(req.params.messageId).isSenderClient === false) {
+				// foundChat.messages.id(req.params.messageId).remove()
+				console.log('Looks like you made the cut realtor!');
+			} else {
+				res.json({
+					data: {},
+					message: "You must be the message's owner to delete or modify.",
+					status: 401
+				}), 401
+			}
+		} else(
+			res.json({
+				data: {},
+				message: 'User id does not match with participant in chat.',
+				status: 401
+			}), 401
+		)
 
 		// chat.id: 5e54c73cddfb8d4bacfa0da1
+		// message in chat: 5e555d49d42e73544079034e
 
+		// res.json(foundChat)
 
 	} catch(err) {
 		next(err)
