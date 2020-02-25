@@ -101,4 +101,10 @@ router.get('/logout', async (req, res, next) => {
 })
 
 
+// Terminate Realtor/Client Relationship
+//router.get('/terminate')
+
+
+
+
 module.exports = router

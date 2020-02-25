@@ -1,5 +1,8 @@
 const express = require('express')
 const router = express.Router()
+// custom middleware
+const isClientAuth = require('../lib/isClientAuth')
+
 // models
 const Client = require('../models/client')
 
@@ -55,7 +58,7 @@ router.post('/register', async (req, res, next) => {
 			req.session.loggedInUser = client
 			req.session.isClient = true
 
-			res.status.(200).json({
+			res.status(200).json({
 				data: createdClient,
 				message: "Successfully Registered New Account",
 				status: 200
@@ -110,6 +113,19 @@ router.get('/logout', async (req, res, next) => {
 		next(err)
 	}
 })
+
+
+// Contract Realtor/Client Relationship
+router.get('/contract/:realtorId', isClientAuth, async (req, res, next) => {
+	try {
+		const foundRealtor = await Realtor.findById(req.params.realtorId)
+
+	} catch(err) {
+		next(err)
+	}
+})
+
+
 
 
 

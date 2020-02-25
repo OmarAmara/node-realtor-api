@@ -21,6 +21,7 @@ router.get('/', async (req, res, next) => {
 				client: req.session.loggedInUser._id 
 			 }).populate('messages._id').populate('client').populate('realtor')
 			//--> Front-end will have to loop all conversation and then messages!
+
 			// remove sensitive information
 			conversations.forEach((convo)=>{
 				 convo.client.password = null
@@ -58,7 +59,7 @@ router.get('/', async (req, res, next) => {
 
 
 // Create Message in chat Route
-router.post('/messages/:chatId/', async (req, res, next) => {
+router.post('/messages/:chatId', async (req, res, next) => {
 	try {
 		const foundChat = await Chat.findById(req.params.chatId)
 		console.log('foundChat: ', foundChat);
@@ -66,7 +67,6 @@ router.post('/messages/:chatId/', async (req, res, next) => {
 		if(foundChat.client.toString() === req.session.loggedInUser._id || foundChat.realtor.toString() === req.session.loggedInUser._id) {
 			const loggedInUserMessage = {
 				body: req.body.body,
-				// test this with realtor loggedIn
 				isSenderClient: req.session.isClient
 			}
 
@@ -76,7 +76,7 @@ router.post('/messages/:chatId/', async (req, res, next) => {
 				`foundChat: ${foundChat}`
 			)
 		} else {
-			res.json("You must be a realtor?")
+			res.json("Hey are you a realtor? Must be a client to do this!")
 			console.log(foundChat.client + " " + req.session.loggedInUser._id);
 		}
 
@@ -147,7 +147,6 @@ router.post('/:realtorId', isClientAuth, async (req, res, next) => {
 		const convoWithRealtor = await Chat.find({ $and: [{client: req.session.loggedInUser._id, realtor: req.params.realtorId}] }).populate('client').populate('realtor')
 		console.log(convoWithRealtor);
 		if(convoWithRealtor.length < 1) {
-			// res.json('lets create a convo!')
 
 			const createdChat = await Chat.create({
 				client: req.session.loggedInUser._id,
