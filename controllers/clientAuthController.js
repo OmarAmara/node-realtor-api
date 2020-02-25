@@ -121,18 +121,24 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 
 		const foundRealtor = await Realtor.findById(req.params.realtorId)
 
+		let clientExists = false
+		foundRealtor.clients.forEach((client) => {
+			if (client.email === req.session.loggedInUser.email) {
+				let clientExists = client.email
+			}
+		})
 
-		if(req.session.loggedInUser.currentRealtor !== foundRealtor) {
+		if(!clientExists) {
 
 			let client = req.session.loggedInUser
 			client.password = null
 			client.recoveryAnswer = null
 			client.recoveryQuestion = null
-			console.log(client)
+			console.log('The client being added to realtor arr: ', client)
 
 			foundRealtor.clients.push(client)
 			await foundRealtor.save()
-			console.log(foundRealtor)
+			console.log('foundRealtor after save: ', foundRealtor)
 			// ^^ Everything above functions as intended.
 
 			// error due to value of object being casted to string as defined in client model...
@@ -142,8 +148,25 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 				currentRealtor: foundRealtor
 			}
 
-			const updateCurrentClient = await Client.findByIdAndUpdate(req.session.loggedInUser._id, currentRealtor)
-			console.log(updateCurrentClient)
+			const updateCurrentClient = await Client.findById(req.session.loggedInUser._id)
+			updateCurrentClient.realtorsWorkedWith.push(foundRealtor)
+			updateCurrentClient.currentRealtor = foundRealtor
+
+			await updateCurrentClient.save()
+			console.log('updatedCurrentClient after save: ', updateCurrentClient)
+
+			res.status(200).json({
+			 	data: foundRealtor,
+			 	message: "Contracted New Realtor",
+			 	status: 200
+			})
+		} else{
+			console.log('***CHECK DB to see if this is true, that clientExists in .forEach above. clientExists: ', clientExists)
+			res.status(400).json({
+				data: {},
+				message: "Something went wrong",
+				status: 400
+			})
 		}
 
 
