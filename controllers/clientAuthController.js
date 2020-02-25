@@ -120,15 +120,18 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 	try {
 
 		const foundRealtor = await Realtor.findById(req.params.realtorId)
+		console.log('THIS IS FOUNDREALTOR: ', foundRealtor)
 
 		let clientExists = false
 		foundRealtor.clients.forEach((client) => {
 			if (client.email === req.session.loggedInUser.email) {
-				let clientExists = client.email
+				clientExists = true
+				console.log('READ THIS, PRINTING CLIENT.EMAIL in .forEACH: ', client.email)
 			}
 		})
+		console.log('\n\n\nclientExists: ', clientExists)
 
-		if(!clientExists) {
+		if(clientExists === false) {
 
 			let client = req.session.loggedInUser
 			client.password = null
