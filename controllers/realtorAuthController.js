@@ -43,7 +43,7 @@ router.post('/register', async (req, res, next) => {
 		 	createdRealtor.password = null
 
 			// session cookie
-			req.session.loggedInUser = realtor
+			req.session.loggedInUser = Createdrealtor
 			req.session.isClient = false
 
 			res.json(createdRealtor)
