@@ -67,7 +67,15 @@ router.post('/login', async (req, res, next) => {
 			// variable for bcrypt to compare to saves hashed password
 			console.log(client)
 			if(client.password === req.body.password) {
-				res.json("Logged In!")
+				client.password = null
+				client.recoveryQuestion = null
+				client.recoveryAnswer = null
+				req.session.loggedInUser = client
+				res.json({
+					data: client, 
+					message: "Client Successfully Logged In!", 
+					status: 201
+				})
 			} else {
 				res.json("Invalid Username or Password")
 			}
@@ -80,7 +88,7 @@ router.post('/login', async (req, res, next) => {
 // Logout Client Route
 router.get('/logout', async (req, res, next) => {
 	try {
-		//await //destroy session data
+		await req.session.destroy()
 
 		res.json("Client Successfully Logged Out")
 	} catch(err) {

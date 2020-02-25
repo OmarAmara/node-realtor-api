@@ -12,12 +12,30 @@ const PORT = process.env.PORT
 // middleware modules
 const methodOverride = require('method-override')
 const bodyParser = require('body-parser')
+const session = require('express-session')
+// const bcrypt = require('bcrypt')
 
 
 /* -- MIDDLEWARE -- */
 app.use(bodyParser.urlencoded({ extended: false })) // request.body
 app.use(methodOverride('_method')) // necessary?
 app.use(express.json()) // utilize json data from request.body
+app.use(session({
+	secret: process.env.SESSION_SECRET,
+	// alternatives to save upon refresh? disadvantages?
+	resave: false,
+	// see note above^
+	saveUninitialized: false
+}))
+
+
+// necessary?
+/* -- SESSION DATA -- */
+app.use((req, res, next) => {
+	res.locals.loggedInUser = req.session.loggedInUser
+	console.log('\nthis is locals in server: ', res.locals.loggedInUser)
+	next()
+})
 
 
 /* -- CONTROLLERS -- */

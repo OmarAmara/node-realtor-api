@@ -65,6 +65,7 @@ router.post('/login', async (req, res, next) => {
 				// spread destructorer, but gives too much info
 				// const { password, ...noPassword } = realtor console.log(noPassword)
 				realtor.password = null
+				req.session.loggedInUser = realtor
 				res.json({
 					data: realtor, 
 					message: "Realtor Successfully Logged In!", 
@@ -82,7 +83,7 @@ router.post('/login', async (req, res, next) => {
 // Logout Realtor Route
 router.get('/logout', async (req, res, next) => {
 	try {
-		//await //destroy session data
+		await req.session.destroy()
 
 		res.json("Realtor Successfully Logged Out")
 	} catch(err) {
