@@ -70,7 +70,11 @@ router.post('/login', async (req, res, next) => {
 				client.password = null
 				client.recoveryQuestion = null
 				client.recoveryAnswer = null
+
+				// create cookie
 				req.session.loggedInUser = client
+				req.session.isClient = true
+
 				res.json({
 					data: client, 
 					message: "Client Successfully Logged In!", 

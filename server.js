@@ -29,11 +29,13 @@ app.use(session({
 }))
 
 
-// necessary?
+// necessary? Yes? Becuase would validate session data every time?
 /* -- SESSION DATA -- */
 app.use((req, res, next) => {
 	res.locals.loggedInUser = req.session.loggedInUser
 	console.log('\nthis is locals in server: ', res.locals.loggedInUser)
+	res.locals.isClient = req.session.isClient
+	console.log('\nthis isClient in session: ', res.locals.isClient)
 	next()
 })
 
@@ -43,8 +45,11 @@ app.use((req, res, next) => {
 const clientAuthController = require('./controllers/clientAuthController')
 app.use('/api/v1.0/clients', clientAuthController)
 // Realtor
-const realtorAuthController = require('./Controllers/realtorAuthController')
+const realtorAuthController = require('./controllers/realtorAuthController')
 app.use('/api/v1.0/realtors', realtorAuthController)
+// Chat
+const chatController = require('./controllers/chatController')
+app.use('/api/v1.0/chats', chatController)
 
 
 /* -- ROUTES -- */

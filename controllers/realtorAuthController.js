@@ -65,6 +65,8 @@ router.post('/login', async (req, res, next) => {
 				// spread destructorer, but gives too much info
 				// const { password, ...noPassword } = realtor console.log(noPassword)
 				realtor.password = null
+
+				// session cookie
 				req.session.loggedInUser = realtor
 				res.json({
 					data: realtor, 
