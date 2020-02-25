@@ -18,6 +18,15 @@ router.get('/', async (req, res, next) => {
 	}
 })
 
+
+// Create Message Route
+router.post('/messages/:realtorId', async (req, res, next) => {
+		
+})
+
+
+
+// Create Chat thread Route
 router.post('/:realtorId', isClientAuth, async (req, res, next) => {
 	try {
 		console.log(req.body);
@@ -41,19 +50,6 @@ router.post('/:realtorId', isClientAuth, async (req, res, next) => {
 	} catch(err) {
 		next(err)
 	}
-
-})
-
-
-
-
-
-
-
-// Create Chat thread Route
-router.get('/', isClientAuth, async (req, res, next) => {
-	console.log('Hit message create route');
-	res.json("Hello Client that's trying to create a message!")
 })
 
 

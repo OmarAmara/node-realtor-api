@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 
+// MAYBE chat should be contained within bot client and realtor schema as subdoc that gets updated on both ends?
 const chatSchema = mongoose.Schema({
 	client: {
 		type: mongoose.Schema.Types.ObjectId,
