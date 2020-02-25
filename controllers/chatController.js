@@ -20,8 +20,24 @@ router.get('/', async (req, res, next) => {
 
 
 // Create Message Route
-router.post('/messages/:realtorId', async (req, res, next) => {
-		
+router.post('/messages/:chatId/', async (req, res, next) => {
+	try {
+		const foundChat = await Chat.findById(req.params.chatId)
+		console.log('foundChat: ', foundChat);
+		console.log(foundChat.client);
+
+		if(foundChat.client.toString() === req.session.loggedInUser._id) {
+			res.json(
+				"I work, now add message to story id, use boolean!"
+			)
+		} else {
+			res.json("Some logic went wrong.")
+			console.log(foundChat.client + " " + req.session.loggedInUser._id);
+		}
+
+	} catch(err) {
+		next(err)
+	}
 })
 
 

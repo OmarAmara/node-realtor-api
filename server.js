@@ -33,7 +33,7 @@ app.use(session({
 /* -- SESSION DATA -- */
 app.use((req, res, next) => {
 	res.locals.loggedInUser = req.session.loggedInUser
-	console.log('\nthis is locals in server: ', res.locals.loggedInUser)
+	console.log('\nthis is loggedInUser in server: ', res.locals.loggedInUser)
 	res.locals.isClient = req.session.isClient
 	console.log('\nthis isClient in session: ', res.locals.isClient)
 	next()
