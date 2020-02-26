@@ -182,9 +182,7 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 // Terminate Realtor/Client Relationship
 router.put('/terminate/:clientId', async (req, res, next) => {
 	try {
-		// Queries in local route scope to utilize in different conditional statements
 		const updatedClient = await Client.findById(req.params.clientId)
-
 		// find realtor to update from client query. Helpful since client can only have one realtor.
 		const updatedRealtor = await Realtor.findById(updatedClient.currentRealtor[0]._id.toString())
 
@@ -213,6 +211,7 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 				await updatedClient.save()
 				await updatedRealtor.save()
 
+				// update session
 				req.session.loggedInUser = updatedRealtor
 
 				updatedClient.password = null
@@ -226,10 +225,12 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 					status: 200
 				})
 			} else {
-				res./*status( )*/json({
-					data: {},
+				res.status(404)json({
+					data: {
+						NotFound: "Resource Does Not Exist"
+					},
 					message: "Cannot find Client in Realtor's Client List",
-					status: "We'll See"
+					status: 404
 				})
 			}
 
@@ -252,56 +253,22 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 
 			req.session.loggedInUser = updatedClient
 
-			// remove password and sensitive information after each .save() ** Not Before!!
-				res.status(200).json({
-					data: {
-						terminatedRealtorContactInfo: updatedRealtor.contactInfo
-					},
-					message: "Terminated Contract with Realtor.",
-					status: 200
-				})
-		} else {
-			res.status(401).json({
+			res.status(200).json({
 				data: {
-					unauthorized: "User is not contracted with provided User id."
+					terminatedRealtorContactInfo: updatedRealtor.contactInfo
+				},
+				message: "Terminated Contract with Realtor.",
+				status: 200
+			})
+		} else {
+			res.status(403).json({
+				data: {
+					Forbidden: "User is not contracted with provided User id."
 				},
 				message: "Must be participant in contract to make changes. Perhaps you previously terminated relationship.",
 				status: 401
 			})
 		}
-
-/*
-		if(req.session.loggedInUser._id === clientId || req.session.loggedInUser._id === req.session.loggedInUser.clients//loop here and find client in array) {
-			// find user to terminate contract:
-			const terminateRealtor = {
-				currentRealtor: []
-			}
-			const updatedUser = Client.findById(req.session.loggedInUser._id)
-			updatedUser.currentRealtor = terminateRealtor
-
-
-			// Now change needs to be done on realtor end. Maybe update to models if necessary.
-
-		}
-
-		if(req.sessions.loggedInUser._id !== clientId) {
-
-			if(req.sessions.loggedInUser._id === )
-			// check to see if this logged in user is the Client's realtor instead...
-
-			// check to see if this person is even a client...
-		}
-
-*/
-		
-			// logged in client & possibility of realtor terminating contact as well.
-
-		// only make it so that client and realtor with relation can change this
-
-		// may be very similar to client create contract route in clientController
-			// with exception that realtor can now also use this route? 
-				//^^--> may need to double the logic for realtro/client and DRY up later
-
 
 	} catch(err) {
 		next(err)
