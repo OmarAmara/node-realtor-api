@@ -190,29 +190,30 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 
 		// if logged in User is a Realtor and if retrieved client's realtor is logged in realtor
 		if(req.session.isClient === false && updatedClient.currentRealtor[0]._id.toString() === req.session.loggedInUser._id) {
+
 			// Loop through realtor's client list to check if logged in realtor is contracted with client
 			const isAClient = req.session.loggedInUser.clients.some(client => client._id === req.params.clientId)
 
 			// if client was found in realtor's client list
 			if(isAClient) {
+
 				// remove realtor from client
 				updatedClient.currentRealtor = []
-				console.log('\n\nupdated client after removing realtor: \n', updatedClient);
 
 				// remove client from realtor's clients list
 				updatedRealtor.clients.forEach((client, key) => {
 					if(client._id === req.params.clientId) {
-						console.log("\n\tFound the Client In Realtor's Client List\n\n");
 
 						// removes object in this position of array
 						updatedRealtor.clients.splice(key, 1)
 						updatedRealtor.clientHistory.push(client)
 					}
 				})
-				console.log(updatedRealtor);
-				// .save() updatedRealtor here
 
-				// req.session.loggedInUser = updatedRealtor
+				await updatedClient.save()
+				await updatedRealtor.save()
+
+				req.session.loggedInUser = updatedRealtor
 
 				updatedClient.password = null
 				updatedClient.recoveryQuestion = null
@@ -235,22 +236,21 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 		// If loggedInUser is the Client terminating contract	
 		} else if(req.session.loggedInUser._id === req.params.clientId) {
 			updatedClient.currentRealtor = []
-			console.log('\n\nupdated client after removing realtor: \n', updatedClient);
 
 			// remove client from realtor's clients list
 			updatedRealtor.clients.forEach((client, key) => {
 				if(client._id === req.params.clientId) {
-					console.log("\n\tFound the Client In Realtor's Client List\n\n");
 
 					// removes object in this position of array
 					updatedRealtor.clients.splice(key, 1)
 					updatedRealtor.clientHistory.push(client)
 				}
 			})
-			console.log(updatedRealtor);
-			// .save() updatedRealtor here
 
-			// req.session.loggedInUser = updatedRealtor
+			await updatedClient.save()
+			await updatedRealtor.save()
+
+			req.session.loggedInUser = updatedClient
 
 			// remove password and sensitive information after each .save() ** Not Before!!
 				res.status(200).json({
