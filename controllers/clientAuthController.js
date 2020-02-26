@@ -205,15 +205,19 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 				console.log('\n\nupdated client after removing realtor: \n', updatedClient);
 
 				// remove client from realtor's clients list
-				updatedRealtor.clients.forEach((client) => {
+				updatedRealtor.clients.forEach((client, key) => {
 					if(client._id === req.params.clientId) {
 						console.log("\n\tFound the Client In Realtor's Client List\n\n");
 						// client.password = "hello, it's me"
-						delete updatedRealtor.client
+						// updatedRealtor.clients =  updatedRealtor.clients.append(client)
+						// delete updatedRealtor.clients[key]
+						updatedRealtor.clients.splice(key, 1)
+						console.log(client)
 						updatedRealtor.clientHistory.push(client)
 					}
 				})
-				console.log(updatedRealtor);
+				console.log('\n\n\tupdatedRealtor after removing client and pushing client to client history: \n', updatedRealtor);
+				console.log('\n\nClient with email jj should be removed before moving on');
 				// place client in realtor's clientHistory array
 
 			// make changes here to remove client:
