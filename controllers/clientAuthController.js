@@ -141,6 +141,7 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 			// This will be helpful to retrieve without querying entire DB.
 			foundRealtor.password = null
 			foundRealtor.clients = null
+			foundRealtor.clientHistory = null
 			const currentRealtor = {
 				currentRealtor: foundRealtor
 			}
@@ -183,23 +184,17 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 	try {
 		// Queries in local route scope to utilize in different conditional statements
 		const updatedClient = await Client.findById(req.params.clientId)
-		console.log('\n\n\tupdatedClient: \n', updatedClient)
-		// note: remove password and sensitive information after each .save() ** Not Before!!
 
 		// find realtor to update from client query. Helpful since client can only have one realtor.
 		const updatedRealtor = await Realtor.findById(updatedClient.currentRealtor[0]._id.toString())
-		console.log('\n\n\tupdatedRealtor: \n', updatedRealtor);
-		// note: remove password and sensitive information after each .save() ** Not Before!!
 
 		// if logged in User is a Realtor and if retrieved client's realtor is logged in realtor
 		if(req.session.isClient === false && updatedClient.currentRealtor[0]._id.toString() === req.session.loggedInUser._id) {
 			// Loop through realtor's client list to check if logged in realtor is contracted with client
 			const isAClient = req.session.loggedInUser.clients.some(client => client._id === req.params.clientId)
-			console.log('isAClient: ', isAClient)
 
 			// if client was found in realtor's client list
 			if(isAClient) {
-				console.log('It looks like this is your client!')
 				// remove realtor from client
 				updatedClient.currentRealtor = []
 				console.log('\n\nupdated client after removing realtor: \n', updatedClient);
@@ -208,32 +203,28 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 				updatedRealtor.clients.forEach((client, key) => {
 					if(client._id === req.params.clientId) {
 						console.log("\n\tFound the Client In Realtor's Client List\n\n");
-						// client.password = "hello, it's me"
-						// updatedRealtor.clients =  updatedRealtor.clients.append(client)
-						// delete updatedRealtor.clients[key]
+
+						// removes object in this position of array
 						updatedRealtor.clients.splice(key, 1)
-						console.log(client)
 						updatedRealtor.clientHistory.push(client)
 					}
 				})
-				console.log('\n\n\tupdatedRealtor after removing client and pushing client to client history: \n', updatedRealtor);
-				console.log('\n\nClient with email jj should be removed before moving on');
-				// place client in realtor's clientHistory array
+				console.log(updatedRealtor);
+				// .save() updatedRealtor here
 
-			// make changes here to remove client:
-				// from new realtor query of current loggedInUser
-				// from updatedUser that was already queried above. Then .save() updatedUser.
+				// req.session.loggedInUser = updatedRealtor
 
-				// remove password and sensitive information after each .save() ** Not Before!!
+				updatedClient.password = null
+				updatedClient.recoveryQuestion = null
+				updatedClient.recoveryQuestion = null
 				res.status(200).json({
-					data: updatedClient,
+					data: {
+						terminatedClient: updatedClient
+					},
 					message: "Terminated Contract with Client.",
 					status: 200
 				})
 			} else {
-				console.log('Cannot find this client, please try again!')
-
-
 				res./*status( )*/json({
 					data: {},
 					message: "Cannot find Client in Realtor's Client List",
@@ -243,22 +234,38 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 
 		// If loggedInUser is the Client terminating contract	
 		} else if(req.session.loggedInUser._id === req.params.clientId) {
-			// make changes here to remove client:
-				// from new realtor query of current loggedInUser
-				// from updatedUser that was already queried above. Then .save() updatedUser.
+			updatedClient.currentRealtor = []
+			console.log('\n\nupdated client after removing realtor: \n', updatedClient);
 
-			// update session to .save() updatedClient
+			// remove client from realtor's clients list
+			updatedRealtor.clients.forEach((client, key) => {
+				if(client._id === req.params.clientId) {
+					console.log("\n\tFound the Client In Realtor's Client List\n\n");
+
+					// removes object in this position of array
+					updatedRealtor.clients.splice(key, 1)
+					updatedRealtor.clientHistory.push(client)
+				}
+			})
+			console.log(updatedRealtor);
+			// .save() updatedRealtor here
+
+			// req.session.loggedInUser = updatedRealtor
 
 			// remove password and sensitive information after each .save() ** Not Before!!
 				res.status(200).json({
-					data: updatedClient,
+					data: {
+						terminatedRealtorContactInfo: updatedRealtor.contactInfo
+					},
 					message: "Terminated Contract with Realtor.",
 					status: 200
 				})
 		} else {
 			res.status(401).json({
-				data: {},
-				message: "Unauthorized: Must be participant in contract to make changes.",
+				data: {
+					unauthorized: "User is not contracted with provided User id."
+				},
+				message: "Must be participant in contract to make changes. Perhaps you previously terminated relationship.",
 				status: 401
 			})
 		}
