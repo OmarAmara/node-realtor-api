@@ -14,6 +14,7 @@ router.get('/', async (req, res, next) => {
 	res.json(data={ greet: 'hello' })
 })
 
+
 // Register Client Route
 router.post('/register', async (req, res, next) => {
 	try {
@@ -63,6 +64,7 @@ router.post('/register', async (req, res, next) => {
 	}
 })
 
+
 // Login Client Route
 router.post('/login', async (req, res, next) => {
 	try {
@@ -94,6 +96,7 @@ router.post('/login', async (req, res, next) => {
 		next(err)
 	}
 })
+
 
 // Logout Client Route
 router.get('/logout', async (req, res, next) => {
@@ -158,10 +161,110 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 		} else{
 			res.status(400).json({
 				data: {},
-				message: `Client is already contracted with Realtor ${req.session.loggedInUser.currentRealtor[0].contactInfo.firstName + ` ` + req.session.loggedInUser.currentRealtor[0].contactInfo.lastName}. Are you trying to switch realtors? You can contact ${req.session.loggedInUser.currentRealtor[0].contactInfo.firstName} at ${req.session.loggedInUser.currentRealtor[0].contactInfo.email} or feel free to contact support at thereIs@noSupport.com`,
+				message: "Client already contracted with Realtor",//`Client is already contracted with Realtor ${req.session.loggedInUser.currentRealtor[0].contactInfo.firstName + ` ` + req.session.loggedInUser.currentRealtor[0].contactInfo.lastName}. Are you trying to switch realtors? You can contact ${req.session.loggedInUser.currentRealtor[0].contactInfo.firstName} at ${req.session.loggedInUser.currentRealtor[0].contactInfo.email} or feel free to contact support at thereIs@noSupport.com`,
 				status: 400
 			})
 		}
+	} catch(err) {
+		next(err)
+	}
+})
+
+
+// Terminate ALL Realtor/Client Relationship
+// For now, just make this accessible to Client.
+router.put('/terminate/:clientId', async (req, res, next) => {
+	try {
+		// in local route to utilize in different conditional statements
+		const updatedClient = await Client.findById(req.params.clientId)
+		console.log('UpdatedClient: ', updatedClient)
+		// remove password and sensitive information after each .save() ** Not Before!!
+
+
+		// if logged in User is a Realtor and if retrieved client's realtor is logged in realtor
+		if(req.session.isClient === false && updatedClient.currentRealtor[0]._id.toString() === req.session.loggedInUser._id) {
+			// Loop through realtor's client list to check if logged in realtor is contracted with client
+			const isAClient = req.session.loggedInUser.clients.some(client => client._id === req.params.clientId)
+			console.log('isAClient: ', isAClient)
+
+			if(isAClient) {
+				console.log('It looks like this is your client!')
+				// make changes here to remove client:
+					// from new realtor query of current loggedInUser
+					// from updatedUser that was already queried above. Then .save() updatedUser.
+
+				// remove password and sensitive information after each .save() ** Not Before!!
+				res.status(200).json({
+					data: updatedClient,
+					message: "Terminated Contract with Client.",
+					status: 200
+				})
+			} else {
+				console.log('Cannot find this client, please try again!')
+
+
+				res./*status( )*/json({
+					data: {},
+					message: "Cannot find Client in Realtor's Client List",
+					status: "We'll See"
+				})
+			}
+
+		// If loggedInUser is the Client terminating contract	
+		} else if(req.session.loggedInUser._id === req.params.clientId) {
+			// make changes here to remove client:
+				// from new realtor query of current loggedInUser
+				// from updatedUser that was already queried above. Then .save() updatedUser.
+
+			// update session to .save() updatedClient
+
+			// remove password and sensitive information after each .save() ** Not Before!!
+				res.status(200).json({
+					data: updatedClient,
+					message: "Terminated Contract with Realtor.",
+					status: 200
+				})
+		} else {
+			res.status(401).json({
+				data: {},
+				message: "Unauthorized: Must be participant in contract to make changes.",
+				status: 401
+			})
+		}
+
+/*
+		if(req.session.loggedInUser._id === clientId || req.session.loggedInUser._id === req.session.loggedInUser.clients//loop here and find client in array) {
+			// find user to terminate contract:
+			const terminateRealtor = {
+				currentRealtor: []
+			}
+			const updatedUser = Client.findById(req.session.loggedInUser._id)
+			updatedUser.currentRealtor = terminateRealtor
+
+
+			// Now change needs to be done on realtor end. Maybe update to models if necessary.
+
+		}
+
+		if(req.sessions.loggedInUser._id !== clientId) {
+
+			if(req.sessions.loggedInUser._id === )
+			// check to see if this logged in user is the Client's realtor instead...
+
+			// check to see if this person is even a client...
+		}
+
+*/
+		
+			// logged in client & possibility of realtor terminating contact as well.
+
+		// only make it so that client and realtor with relation can change this
+
+		// may be very similar to client create contract route in clientController
+			// with exception that realtor can now also use this route? 
+				//^^--> may need to double the logic for realtro/client and DRY up later
+
+
 	} catch(err) {
 		next(err)
 	}

@@ -39,7 +39,7 @@ router.post('/register', async (req, res, next) => {
 		 	createdRealtor.password = null
 
 			// session cookie
-			req.session.loggedInUser = Createdrealtor
+			req.session.loggedInUser = createdRealtor
 			req.session.isClient = false
 
 			res.json(createdRealtor)
@@ -100,30 +100,6 @@ router.get('/logout', async (req, res, next) => {
 //CLIENT SEARCH INDEX WILL GO HERE//:
 //// Is this necessary or can we just utilize what we have available in session?
 // can we access session on front-end? Aside from using it as logic in back-end routes.
-
-// Terminate ALL Realtor/Client Relationship
-router.put('/terminate', async (req, res, next) => {
-	try {
-		// find user to terminate contract:
-			// logged in client & possibility of realtor terminating contact as well.
-		// const found...
-
-		// only make it so that client and realtor with relation can change this
-
-		// may be very similar to client create contract route in clientController
-			// with exception that realtor can now also use this route. 
-				//^^--> maybe double the logic and DRY up later
-
-
-		res./*status( )*/json({
-			data: "INSERT TERMINATED REALTOR?",
-			message: "Terminated Realtor Contract. MAYBE????",
-			status: "We'll See"
-		})
-	} catch(err) {
-		next(err)
-	}
-})
 
 
 
