@@ -225,7 +225,7 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 					status: 200
 				})
 			} else {
-				res.status(404)json({
+				res.status(404).json({
 					data: {
 						NotFound: "Resource Does Not Exist"
 					},

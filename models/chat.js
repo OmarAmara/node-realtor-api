@@ -29,6 +29,7 @@ const chatSchema = mongoose.Schema({
 		timeSent: {
 			type: Date,
 			default: Date.now(),
+			required: true
 		},
 		// Determines which User "Owns" the message
 		isSenderClient: Boolean,
