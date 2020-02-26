@@ -98,11 +98,24 @@ router.get('/logout', async (req, res, next) => {
 
 
 //CLIENT SEARCH INDEX WILL GO HERE//:
-
+//// Is this necessary or can we just utilize what we have available in session?
+// can we access session on front-end? Aside from using it as logic in routes.
 
 // Terminate Realtor/Client Relationship
-//router.get('/terminate')
+router.get('/terminate', async (req, res, next) => {
+	try {
 
+
+
+		res./*status( )*/json({
+			data: "INSERT TERMINATED REALTOR?",
+			message: "Terminated Realtor Contract. MAYBE????",
+			status: "We'll See"
+		})
+	} catch(err) {
+		next(err)
+	}
+})
 
 
 

@@ -30,13 +30,8 @@ router.post('/register', async (req, res, next) => {
 		})
 
 		if(clientExists) {
-		 	// deprecated warning
-		 	// res.json(
-		 	// 	data={"taken" : "Client Already Exists"},
-		 	// 	status=200 
-		 	// )
-		 	// use req.body to keep casing
 			res.json(`Username: ${req.body.username} or Email: ${req.body.email} Already Exists. Try a different Username or Email`)
+			
 		} else {
 		 	// should be hashing password here
 		 	const createdClient = await Client.create({
@@ -164,8 +159,6 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 		next(err)
 	}
 })
-
-
 
 
 
