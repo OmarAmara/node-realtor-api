@@ -101,10 +101,18 @@ router.get('/logout', async (req, res, next) => {
 //// Is this necessary or can we just utilize what we have available in session?
 // can we access session on front-end? Aside from using it as logic in back-end routes.
 
-// Terminate Realtor/Client Relationship
-router.get('/terminate', async (req, res, next) => {
+// Terminate ALL Realtor/Client Relationship
+router.put('/terminate', async (req, res, next) => {
 	try {
-		const found
+		// find user to terminate contract:
+			// logged in client & possibility of realtor terminating contact as well.
+		// const found...
+
+		// only make it so that client and realtor with relation can change this
+
+		// may be very similar to client create contract route in clientController
+			// with exception that realtor can now also use this route. 
+				//^^--> maybe double the logic and DRY up later
 
 
 		res./*status( )*/json({
