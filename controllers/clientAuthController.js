@@ -112,6 +112,7 @@ router.get('/logout', async (req, res, next) => {
 
 // Contract Realtor/Client Relationship
 //** In future, Make this so hitting route will notify realtor and relationship will only commence once realtor confirms...
+//** Also add so that changing realtor will place client(IN REALTOR USER) in Realtor's clientHistory
 router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 	try {
 		const foundRealtor = await Realtor.findById(req.params.realtorId)
@@ -171,18 +172,18 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 })
 
 
-// Terminate ALL Realtor/Client Relationship
+// Terminate Realtor/Client Relationship
 router.put('/terminate/:clientId', async (req, res, next) => {
 	try {
-		// in local route to utilize in different conditional statements
+		// Queries in local route scope to utilize in different conditional statements
 		const updatedClient = await Client.findById(req.params.clientId)
 		console.log('\n\n\tupdatedClient: \n', updatedClient)
-		// remove password and sensitive information after each .save() ** Not Before!!
+		// note: remove password and sensitive information after each .save() ** Not Before!!
 
 		// find realtor to update from client query. Helpful since client can only have one realtor.
 		const updatedRealtor = await Realtor.findById(updatedClient.currentRealtor[0]._id.toString())
 		console.log('\n\n\tupdatedRealtor: \n', updatedRealtor);
-
+		// note: remove password and sensitive information after each .save() ** Not Before!!
 
 		// if logged in User is a Realtor and if retrieved client's realtor is logged in realtor
 		if(req.session.isClient === false && updatedClient.currentRealtor[0]._id.toString() === req.session.loggedInUser._id) {
@@ -190,11 +191,26 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 			const isAClient = req.session.loggedInUser.clients.some(client => client._id === req.params.clientId)
 			console.log('isAClient: ', isAClient)
 
+			// if client was found in realtor's client list
 			if(isAClient) {
 				console.log('It looks like this is your client!')
-				// make changes here to remove client:
-					// from new realtor query of current loggedInUser
-					// from updatedUser that was already queried above. Then .save() updatedUser.
+				// remove realtor from client
+				updatedClient.currentRealtor = []
+				console.log('\n\nupdated client after removing realtor: ', updatedClient);
+
+				// remove client from realtor's clients list
+				updatedRealtor.clients.forEach((client) => {
+					if(client._id === req.params.clientId) {
+						console.log("\n\tFound the Client In Realtor's Client List\n\n");
+						client.password = "hello, it's me"
+					}
+				})
+				console.log(updatedRealtor);
+				// place client in realtor's clientHistory array
+
+			// make changes here to remove client:
+				// from new realtor query of current loggedInUser
+				// from updatedUser that was already queried above. Then .save() updatedUser.
 
 				// remove password and sensitive information after each .save() ** Not Before!!
 				res.status(200).json({

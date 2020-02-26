@@ -17,7 +17,10 @@ const chatSchema = mongoose.Schema({
 	messages: [{
 		// To Hide Message, messages never actually deleted for Hx and reference.
 		// Consider necessity of time archived? archived: {type:Bool, time:Date...}
-		archived: Boolean,
+		archived: {
+			type: Boolean,
+			default: false,
+		},
 		body: {
 			type: String,
 			minlength: 1,
@@ -30,9 +33,18 @@ const chatSchema = mongoose.Schema({
 		// Determines which User "Owns" the message
 		isSenderClient: Boolean,
 		// is this necessary for now?
-		delivered: Boolean,
+		// delivered: Boolean,
 		// Provides interactivity and notification logic.
-		read: Boolean
+		senderRead: {
+			type: Boolean,
+			default: false
+			// add date? Way to validate to add date when value changes to true?
+		},
+		recipientRead: {
+			type: Boolean,
+			default: false
+			// add date? Way to validate to add date when value changes to true?
+		}
 	}]
 })
 
