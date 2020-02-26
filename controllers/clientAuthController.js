@@ -172,13 +172,16 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 
 
 // Terminate ALL Realtor/Client Relationship
-// For now, just make this accessible to Client.
 router.put('/terminate/:clientId', async (req, res, next) => {
 	try {
 		// in local route to utilize in different conditional statements
 		const updatedClient = await Client.findById(req.params.clientId)
-		console.log('UpdatedClient: ', updatedClient)
+		console.log('\n\n\tupdatedClient: \n', updatedClient)
 		// remove password and sensitive information after each .save() ** Not Before!!
+
+		// find realtor to update from client query
+		const updatedRealtor = await Realtor.findById(updatedClient.currentRealtor[0]._id.toString())
+		console.log('\n\n\tupdatedRealtor: \n', updatedRealtor);
 
 
 		// if logged in User is a Realtor and if retrieved client's realtor is logged in realtor
