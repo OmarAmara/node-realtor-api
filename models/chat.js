@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 
 // MAYBE chat should be contained within bot client and realtor schema as subdoc that gets updated on both ends?
+// Currently reduces query time by chat hosting where messages live.
+// Front-End note --> Chat name display: logic to display other account’s name as chatroom name.
 const chatSchema = mongoose.Schema({
 	client: {
 		type: mongoose.Schema.Types.ObjectId,
@@ -13,6 +15,9 @@ const chatSchema = mongoose.Schema({
 		required: true
 	},
 	messages: [{
+		// To Hide Message, messages never actually deleted for Hx and reference.
+		// Consider necessity of time archived? archived: {type:Bool, time:Date...}
+		archived: Boolean,
 		body: {
 			type: String,
 			minlength: 1,
@@ -22,12 +27,13 @@ const chatSchema = mongoose.Schema({
 			type: Date,
 			default: Date.now(),
 		},
-		isSenderClient: Boolean
-		//consider the following:
-		//, delivered: Boolean,
-		//read: Boolean
+		// Determines which User "Owns" the message
+		isSenderClient: Boolean,
+		// is this necessary for now?
+		delivered: Boolean,
+		// Provides interactivity and notification logic.
+		read: Boolean
 	}]
-
 })
 
 const Chat = mongoose.model('Chat', chatSchema)

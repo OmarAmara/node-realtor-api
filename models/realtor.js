@@ -64,8 +64,10 @@ const realtorSchema = mongoose.Schema({
 	websiteURL: {
 		type: String
 	},
-	// array of realtor's clients
+	// array of realtor's current clients
 	clients: [],
+	// resolved/ terminated client contracts/relationships
+	clientHistory: [],
 	password: {
 		type: String,
 		required: true

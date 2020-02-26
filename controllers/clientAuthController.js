@@ -179,7 +179,7 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 		console.log('\n\n\tupdatedClient: \n', updatedClient)
 		// remove password and sensitive information after each .save() ** Not Before!!
 
-		// find realtor to update from client query
+		// find realtor to update from client query. Helpful since client can only have one realtor.
 		const updatedRealtor = await Realtor.findById(updatedClient.currentRealtor[0]._id.toString())
 		console.log('\n\n\tupdatedRealtor: \n', updatedRealtor);
 
