@@ -29,11 +29,10 @@ app.use(session({
 }))
 
 
-// necessary? Yes? Becuase would validate session data every time?
 /* -- SESSION DATA -- */
 app.use((req, res, next) => {
 	res.locals.loggedInUser = req.session.loggedInUser
-	// console.log('\nthis is loggedInUser in server: ', res.locals.loggedInUser)
+	console.log('\nthis is loggedInUser in server: ', res.locals.loggedInUser)
 	res.locals.isClient = req.session.isClient
 	console.log('\nthis isClient in session: ', res.locals.isClient)
 	next()
@@ -57,7 +56,13 @@ app.use('/api/v1.0/searches', searchController)
 
 /* -- ROUTES -- */
 app.get('*', (req, res) => {
-	res.status(404).send('404 NOT FOUND')	
+	res.status(404).json({
+		data: {
+			NotFound: "404 NOT FOUND"
+		},
+		message: "Did we mean to travel here, wonderer?",
+		status: 404
+	})	
 })
 
 /* -- LISTENER -- */

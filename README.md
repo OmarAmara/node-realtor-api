@@ -3,4 +3,4 @@ Node-express server used to authenticate and store client/broker data. To be Imp
 
 API used to Authenticate clients/realtor brokers, store communications and listing searches between client/realtor relationships.
 
-(Project Planning)[https://trello.com/b/oGLsYwgP/node-react-estates-user-stories]
+[Project Planning](https://trello.com/b/oGLsYwgP/mern-realtor-estates)

@@ -9,6 +9,7 @@ const Realtor = require('../models/realtor')
 
 
 /* -- Client ROUTES -- */
+
 // test route
 router.get('/', async (req, res, next) => {
 	res.json(data={ greet: 'hello' })

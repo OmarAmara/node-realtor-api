@@ -5,6 +5,7 @@ const Realtor = require('../models/realtor')
 
 
 /* -- Realtor ROUTES -- */
+
 // Register Realtor Route
 router.post('/register', async (req, res, next) => {
 	try {
