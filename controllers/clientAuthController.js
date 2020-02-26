@@ -31,7 +31,7 @@ router.post('/register', async (req, res, next) => {
 
 		if(clientExists) {
 			res.json(`Username: ${req.body.username} or Email: ${req.body.email} Already Exists. Try a different Username or Email`)
-			
+
 		} else {
 		 	// should be hashing password here
 		 	const createdClient = await Client.create({
@@ -111,9 +111,9 @@ router.get('/logout', async (req, res, next) => {
 //** In future, Make this so hitting route will notify realtor and relationship will only commence once realtor confirms...
 router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 	try {
-
 		const foundRealtor = await Realtor.findById(req.params.realtorId)
 
+		// searches realtor's client list to see if loggedInUser is existing client
 		let clientExists = false
 		foundRealtor.clients.forEach((client) => {
 			if (client.email === req.session.loggedInUser.email) {
@@ -122,15 +122,20 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 		})
 
 		if(clientExists === false) {
-
-			let client = req.session.loggedInUser
-			client.password = null
-			client.recoveryAnswer = null
-			client.recoveryQuestion = null
+			// hides sensitive information of client
+			let client = {
+				_id: req.session.loggedInUser._id,
+				email: req.session.loggedInUser.email,
+				username: req.session.loggedInUser.username,
+				firstName: req.session.loggedInUser.firstName,
+				lastName: req.session.loggedInUser.lastName
+			}
 
 			foundRealtor.clients.push(client)
 			await foundRealtor.save()
 
+			// Hides sensitive data of realtor after save to not effect data, then realtor info saved into client.
+			// This will be helpful to retrieve without querying entire DB.
 			foundRealtor.password = null
 			foundRealtor.clients = null
 			const currentRealtor = {
@@ -142,6 +147,8 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 			updateCurrentClient.currentRealtor = foundRealtor
 
 			await updateCurrentClient.save()
+			// prevents error if loggedInUser session is not updated and realtor route is hit again before logging back in.
+			req.session.loggedInUser = updateCurrentClient
 
 			res.status(200).json({
 			 	data: foundRealtor,
