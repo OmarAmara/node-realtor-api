@@ -130,7 +130,6 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 			let client = {
 				_id: req.session.loggedInUser._id,
 				email: req.session.loggedInUser.email,
-				username: req.session.loggedInUser.username,
 				firstName: req.session.loggedInUser.firstName,
 				lastName: req.session.loggedInUser.lastName
 			}
@@ -147,7 +146,14 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 			}
 
 			const updateCurrentClient = await Client.findById(req.session.loggedInUser._id)
-			updateCurrentClient.realtorsWorkedWith.push(foundRealtor)
+
+			const addToRealtorHistory = {
+				_id: foundRealtor._id,
+				contactInfo: foundRealtor.contactInfo
+			}
+
+			updateCurrentClient.realtorsWorkedWith.push(addToRealtorHistory)
+
 			updateCurrentClient.currentRealtor = foundRealtor
 
 			await updateCurrentClient.save()
@@ -196,13 +202,15 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 				console.log('It looks like this is your client!')
 				// remove realtor from client
 				updatedClient.currentRealtor = []
-				console.log('\n\nupdated client after removing realtor: ', updatedClient);
+				console.log('\n\nupdated client after removing realtor: \n', updatedClient);
 
 				// remove client from realtor's clients list
 				updatedRealtor.clients.forEach((client) => {
 					if(client._id === req.params.clientId) {
 						console.log("\n\tFound the Client In Realtor's Client List\n\n");
-						client.password = "hello, it's me"
+						// client.password = "hello, it's me"
+						delete updatedRealtor.client
+						updatedRealtor.clientHistory.push(client)
 					}
 				})
 				console.log(updatedRealtor);
