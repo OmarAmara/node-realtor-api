@@ -50,6 +50,9 @@ app.use('/api/v1.0/realtors', realtorAuthController)
 // Chat
 const chatController = require('./controllers/chatController')
 app.use('/api/v1.0/chats', chatController)
+// Search
+const searchController = require('./controllers/searchController')
+app.use('/api/v1.0/searches', searchController)
 
 
 /* -- ROUTES -- */
