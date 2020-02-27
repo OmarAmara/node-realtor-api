@@ -69,7 +69,13 @@ router.post('/index/:clientId', isRealtorAuth, async (req, res, next) => {
 			// 
 			req.session.loggedInUser.clients.forEach(async(client, key) => {
 				if(client._id === req.params.clientId) {
-					console.log('hello');
+					const clientSearchList = await Search.find({ client: req.params.clientId })
+					
+					res.status(200).json({
+						data: clientSearchList,
+						message: `Successfully Retrieved ${clientSearchList.length} Searches from Client`,
+						status: 200
+					})
 				}
 			})
 		} else {
