@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 // custom middleware
 const isClientAuth = require('../lib/isClientAuth')
+const isRealtorAuth = require('../lib/isRealtorAuth')
 
 // models
 const Search = require('../models/search')
@@ -28,20 +29,32 @@ router.post('/', isClientAuth, async (req, res, next) => {
 })
 
 
-// Search Index Route
-router.get('/', async (req, res, next) => {
+// Search Index Client Route
+router.get('/index', isClientAuth, async (req, res, next) => {
 	
 	if(req.session.isClient === true) {
 		const searchList = await Search.find({ client: req.session.loggedInUser._id })//.populate('client')
 
 		res.status(200).json({
 			data: searchList,
-			message: `Retrieved ${searchList.length} Found Searches`,
+			message: `Successfully Retrieved ${searchList.length} Client Searches`,
 			status: 200
 		})
+	} else {
+		res.status(401).json({
+			data: {
+				Unauthorized: "Not Authorized To Perform Action"
+			},
+			message: "Must be logged in to view content.",
+			status: 401
+		})
 	}
+})
 
-	/* Seperate Route for Realtor? */
+
+// Search Index Realtor's Client Route
+router.post('/index/:clientId', isRealtorAuth, async (req, res, next) => {
+
 	if(req.session.isClient === false && /*query for client here.*/currentRealtor[0].username === req.session.loggedInUser.username) {
 		// 
 		req.session.loggedInUser.clients.forEach((client, key) => {
@@ -52,7 +65,6 @@ router.get('/', async (req, res, next) => {
 			}
 		})
 	}
-
 
 })
 // Client and contracted Realtor needs a searchIndex
