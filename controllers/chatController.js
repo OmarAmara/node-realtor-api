@@ -12,6 +12,7 @@ const Chat = require('../models/chat')
 // Index Chat/ message Route
 // Find a DRYer way here:
 // Why do message id's return as null?
+// try different populations. like populate('messages.id'), ...
 router.get('/', async (req, res, next) => {
 	try {
 		console.log(req.session.loggedInUser._id);

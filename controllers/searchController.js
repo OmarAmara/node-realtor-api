@@ -94,23 +94,45 @@ router.post('/index/:clientId', isRealtorAuth, async (req, res, next) => {
 
 // Delete Search Route
 router.delete('/:id', isClientAuth, async (req, res, next) => {
+	try{
+		const verifySearch = await Search.findById(req.params.id)
 
-	if(req.session.isClient) {
-		const deletedSearch = await Search.findById(req.params.id)
+		if(req.session.loggedInUser._id === verifySearch.client.toString()) {
+			// Utilize first query above to verify account, then second query below to remove.
+			const deleteVerifiedSearch = await Search.findByIdAndRemove(req.params.id)
+			
+			// verifySearch.remove(verifySearch).update()
+			// verifySearch.remove(verifySearch).save()
+			// Side Note: Only Directly update data (findByIdAndUpdate, remove...) that can be changed from more than one source or account.
+			// .save() or similar, .update() loads data to client side then performs updated action, may cause an error if someone else edits the same data...
 
-		res.status(200).json({
-			data: {deletedSearch},
-			message: "Successfully deleted Client's Search",
-			status: 200
-		})
-	} else {
-		res.status(405).json({
-			data: {},
-			message: "Method Not Allowed.",
-			status: 405
-		})
+			res.status(200).json({
+				data: {deleteVerifiedSearch},
+				message: "Successfully deleted Client's Search",
+				status: 200
+			})
+		} else {
+			res.status(405).json({
+				data: {},
+				message: "Method Not Allowed.",
+				status: 405
+			})
+		}
+	} catch(err) {
+		next(err)
 	}
+})
 
+
+// Update Search Route
+router.put('/:id', isClientAuth, async (req, res, next) => {
+	try{
+		// const findSearch = await findByIdAndUpdate(req.params.id)
+
+
+	} catch(err) {
+		next(err)
+	}
 })
 
 
