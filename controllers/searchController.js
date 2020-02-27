@@ -21,10 +21,10 @@ router.post('/', isClientAuth, async (req, res, next) => {
 		})
 		console.log(createdSearch);
 
-		res.status(200).json({
+		res.status(201).json({
 			data: createdSearch,
 			message: "Successfully Created Search",
-			status: 200
+			status: 201
 		})
 	} catch(err) {
 		next(err)
@@ -63,7 +63,6 @@ router.get('/index', isClientAuth, async (req, res, next) => {
 router.post('/index/:clientId', isRealtorAuth, async (req, res, next) => {
 	try{
 		const foundClient = await Client.findById(req.params.clientId)
-		console.log(foundClient);
 
 		if(req.session.isClient === false && foundClient.currentRealtor[0].username === req.session.loggedInUser.username) {
 			// 
@@ -90,13 +89,29 @@ router.post('/index/:clientId', isRealtorAuth, async (req, res, next) => {
 	} catch(err) {
 		next(err)
 	}
+})
+
+
+// Delete Search Route
+router.delete('/:id', isClientAuth, async (req, res, next) => {
+
+	if(req.session.isClient) {
+		const deletedSearch = await Search.findById(req.params.id)
+
+		res.status(200).json({
+			data: {deletedSearch},
+			message: "Successfully deleted Client's Search",
+			status: 200
+		})
+	} else {
+		res.status(405).json({
+			data: {},
+			message: "Method Not Allowed.",
+			status: 405
+		})
+	}
 
 })
-// Client and contracted Realtor needs a searchIndex
-	// client can always view searchIndex, Client's Realtor can view the client's searchIndex
-		// realtor: logic for Client id being in realtor's clients[] array.
-
-
 
 
 

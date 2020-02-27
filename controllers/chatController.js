@@ -72,9 +72,11 @@ router.post('/messages/:chatId', async (req, res, next) => {
 
 			foundChat.messages.push(loggedInUserMessage)
 			await foundChat.save()
-			res.json(
-				`foundChat: ${foundChat}`
-			)
+			res.status(201).json({
+				data: foundChat,
+				message: "Successfully created message in chat thread.",
+				status: 201
+			})
 		} else {
 			res.json("Hey are you a realtor? Must be a client to do this!")
 			console.log(foundChat.client + " " + req.session.loggedInUser._id);
@@ -121,17 +123,17 @@ router.delete('/:chatId/:messageId', async (req, res, next) => {
 					status: 200
 				})
 			} else {
-				res.status(401).json({
+				res.status(405).json({
 					data: {},
-					message: "You must be the message's owner to delete or modify.",
-					status: 401
-				}), 401
+					message: "Method Not Allowed. You must be the message's owner to delete or modify.",
+					status: 405
+				})
 			}
 		} else(
-			res.status(401).json({
+			res.status(405).json({
 				data: {},
-				message: 'User id in message does not match with participant in chat. You must be the ownner of the message you are trying to delete.',
-				status: 401
+				message: 'Method Not Allowed. User id in message does not match with participant in chat. You must be the ownner of the message you are trying to delete.',
+				status: 405
 			})
 		)
 
@@ -154,10 +156,10 @@ router.post('/:realtorId', isClientAuth, async (req, res, next) => {
 				messages: []
 			})
 			console.log(createdChat);
-			res.status(200).json({
+			res.status(201).json({
 				data: createdChat,
 				message: "Successfully Started New Chat Thread",
-				status: 200
+				status: 201
 			})
 		} else {
 			res.json(`You have an existing thread with this Realtor!: ${convoWithRealtor.messages}`)

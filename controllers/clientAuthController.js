@@ -56,10 +56,10 @@ router.post('/register', async (req, res, next) => {
 			req.session.loggedInUser = createdClient
 			req.session.isClient = true
 
-			res.status(200).json({
+			res.status(201).json({
 				data: createdClient,
 				message: "Successfully Registered New Account",
-				status: 200
+				status: 201
 			})
 		}
 	} catch(err) {
@@ -87,10 +87,10 @@ router.post('/login', async (req, res, next) => {
 				req.session.loggedInUser = client
 				req.session.isClient = true
 
-				res.status(201).json({
+				res.status(200).json({
 					data: client, 
 					message: "Client Successfully Logged In!", 
-					status: 201
+					status: 200
 				})
 			} else {
 				res.json("Invalid Username or Password")
@@ -165,10 +165,10 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 			// prevents error if loggedInUser session is not updated and realtor route is hit again before logging back in.
 			req.session.loggedInUser = updateCurrentClient
 
-			res.status(200).json({
+			res.status(201).json({
 			 	data: foundRealtor,
 			 	message: "Contracted New Realtor",
-			 	status: 200
+			 	status: 201
 			})
 		} else{
 			res.status(400).json({

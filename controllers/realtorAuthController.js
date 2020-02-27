@@ -22,7 +22,11 @@ router.post('/register', async (req, res, next) => {
 
 		if(realtorExists) {
 			// use req.body to keep casing
-			res.json(`Username: ${req.body.username} or Realtor Brokerage License Already Exists. Try a different Username or check License Number`)
+			res.status(409).json({
+				data: {},
+				messgae: `Username: ${req.body.username} or Realtor Brokerage License Already Exists. Try a different Username or check License Number`,
+				status: 409
+			})
 		} else {
 		 	// should be hashing password here
 		 	const createdRealtor = await Realtor.create({
@@ -44,7 +48,11 @@ router.post('/register', async (req, res, next) => {
 			req.session.loggedInUser = createdRealtor
 			req.session.isClient = false
 
-			res.json(createdRealtor)
+			res.status(201).json({
+				data: createdRealtor,
+				message: "Successfully Registered Account",
+				status: 201
+			})
 		}
 	} catch(err) {
 		// create custom error
