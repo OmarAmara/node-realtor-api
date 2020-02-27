@@ -95,14 +95,15 @@ router.post('/index/:clientId', isRealtorAuth, async (req, res, next) => {
 // Delete Search Route
 router.delete('/:id', isClientAuth, async (req, res, next) => {
 	try{
-		const verifySearch = await Search.findById(req.params.id)
+		// const verifySearch = await Search.findById(req.params.id)
 
-		if(req.session.loggedInUser._id === verifySearch.client.toString()) {
+		// if(req.session.loggedInUser._id === verifySearch.client.toString()) {
 			// Utilize first query above to verify account, then second query below to remove.
-			const deleteVerifiedSearch = await Search.findByIdAndRemove(req.params.id)
+			// const deleteVerifiedSearch = await Search.findByIdAndRemove(req.params.id)
+			const deleteVerifiedSearch = await Search.findOneAndDelete({ $and: [{client: req.session.loggedInUser._id, _id: req.params.id}] })
 			
-			// verifySearch.remove(verifySearch).update()
-			// verifySearch.remove(verifySearch).save()
+			// await verifySearch.remove(verifySearch).update()
+			// await verifySearch.remove(verifySearch).save()
 			// Side Note: Only Directly update data (findByIdAndUpdate, remove...) that can be changed from more than one source or account.
 			// .save() or similar, .update() loads data to client side then performs updated action, may cause an error if someone else edits the same data...
 
@@ -111,13 +112,13 @@ router.delete('/:id', isClientAuth, async (req, res, next) => {
 				message: "Successfully deleted Client's Search",
 				status: 200
 			})
-		} else {
-			res.status(405).json({
-				data: {},
-				message: "Method Not Allowed.",
-				status: 405
-			})
-		}
+		// } else {
+		// 	res.status(405).json({
+		// 		data: {},
+		// 		message: "Method Not Allowed.",
+		// 		status: 405
+		// 	})
+		// }
 	} catch(err) {
 		next(err)
 	}
@@ -127,8 +128,21 @@ router.delete('/:id', isClientAuth, async (req, res, next) => {
 // Update Search Route
 router.put('/:id', isClientAuth, async (req, res, next) => {
 	try{
-		// const findSearch = await findByIdAndUpdate(req.params.id)
 
+		updatedSearch = {
+			...req.body
+		}
+		console.log('this is updates Search: ', updatedSearch);
+
+		// new: true sends updated data back instead of default action of sending back data before it was updated
+		const updateFoundSearch = await Search.findOneAndUpdate({ $and: [{client: req.session.loggedInUser._id, _id: req.params.id}] }, updatedSearch, { new: true })
+		console.log('this is updateFoundSearch: ', updateFoundSearch);
+
+		res.status(200).json({
+			data: updateFoundSearch,
+			message: "Successfully Updated Search",
+			status: 200
+		})
 
 	} catch(err) {
 		next(err)
