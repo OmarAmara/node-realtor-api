@@ -37,6 +37,9 @@ router.post('/register', async (req, res, next) => {
 		} else {
 		 	// should be hashing password here
 		 	const createdClient = await Client.create({
+		 		// TEST THIS POSSIBILITY OF SPREAD:(comment out remainder of create body)
+		 		//req.body.password, req.body.recoveryQuestion...req.body, password: desiredPassword, recoveryQuestion: [`${req.body.recoveryQuestion}`]
+		 		// ^^ This or something similar should exclude pwd & recoveryQuestion from req.body, then add them
 		 		email: desiredEmail,
 		 		username: desiredUsername,
 		 		password: desiredPassword,

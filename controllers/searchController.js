@@ -30,7 +30,30 @@ router.post('/', isClientAuth, async (req, res, next) => {
 
 // Search Index Route
 router.get('/', async (req, res, next) => {
-		
+	
+	if(req.session.isClient === true) {
+		const searchList = await Search.find({ client: req.session.loggedInUser._id })//.populate('client')
+
+		res.status(200).json({
+			data: searchList,
+			message: `Retrieved ${searchList.length} Found Searches`,
+			status: 200
+		})
+	}
+
+	/* Seperate Route for Realtor? */
+	if(req.session.isClient === false && /*query for client here.*/currentRealtor[0].username === req.session.loggedInUser.username) {
+		// 
+		req.session.loggedInUser.clients.forEach((client, key) => {
+			if(client._id === req.params.clientId) {
+
+				updatedRealtor.clients.splice(key, 1)
+				updatedRealtor.clientHistory.push(client)
+			}
+		})
+	}
+
+
 })
 // Client and contracted Realtor needs a searchIndex
 	// client can always view searchIndex, Client's Realtor can view the client's searchIndex

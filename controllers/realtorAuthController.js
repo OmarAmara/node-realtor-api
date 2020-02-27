@@ -27,6 +27,7 @@ router.post('/register', async (req, res, next) => {
 		 	// should be hashing password here
 		 	const createdRealtor = await Realtor.create({
 		 		// GREAT PLACE TO USE SPREAD OPERATOR?
+		 		// ^^ Look at create Client comments to see how this may be implemented.
 		 		username: desiredUsername,
 		 		brokerLicenseNumber: licenseNumber,
 		 		password: desiredPassword,
@@ -34,7 +35,7 @@ router.post('/register', async (req, res, next) => {
 				contactInfo: req.body.contactInfo,
 				websiteURL: req.body.websiteURL
 		 		// Should broker have recovery info like Client?
-		 		// recoveryQuestion: [`req.body.recoveryQuestion`],
+		 		// recoveryQuestion: [req.body.recoveryQuestion],
 		 		// recoveryAnswer: req.body.recoveryAnswer,
 		 	})
 		 	createdRealtor.password = null
