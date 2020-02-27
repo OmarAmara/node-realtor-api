@@ -115,7 +115,7 @@ router.get('/logout', async (req, res, next) => {
 
 
 // Contract Realtor/Client Relationship
-//** In future, Make this so hitting route will notify realtor and relationship will only commence once realtor confirms...
+//** Stretch: Hitting this route will notify realtor and relationship will only commence once realtor confirms...
 //** Also add so that changing realtor will place client(IN REALTOR USER) in Realtor's clientHistory
 router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 	try {
