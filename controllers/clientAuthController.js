@@ -270,7 +270,6 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 				status: 401
 			})
 		}
-
 	} catch(err) {
 		next(err)
 	}

@@ -12,8 +12,23 @@ const Client = require('../models/client')
 
 // Create Search Route
 router.post('/', isClientAuth, async (req, res, next) => {
-	
-			
+	const createdSearch = await Search.create({
+		// utilize spread operator?
+		name: req.body.name,
+		zipcode: req.body.zipcode,
+		sqrft: req.body.sqrft,
+		upperPrice: req.body.upperPrice,
+		lowerPrice: req.body.lowerPrice,
+		client: req.session.loggedInUser._id
+		// ...req.params
+	})
+	console.log(createdSearch);
+
+	res.status(200).json({
+		data: createdSearch,
+		message: "Successfully Created Search",
+		status: 200
+	})
 
 })
 
