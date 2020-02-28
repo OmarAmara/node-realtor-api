@@ -72,7 +72,7 @@ router.post('/register', async (req, res, next) => {
 // Login Client Route
 router.post('/login', async (req, res, next) => {
 	try {
-		const client = await Client.findOne({ email: req.body.email }).populate('currentRealtor.contactInfo._id')
+		const client = await Client.findOne({ email: req.body.email }).populate('currentRealtor._id')//'currentRealtor.contactInfo._id')
 
 		if(!client) {
 			res.json("Invalid Username or Password")
@@ -154,7 +154,10 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 
 			const addToRealtorHistory = {
 				_id: foundRealtor._id,
-				contactInfo: foundRealtor.contactInfo
+				firstName: foundRealtor.firstName,
+				lastName: foundRealtor.lastName,
+				phoneNumber: foundRealtor.phoneNumber,
+				email: foundRealtor.email
 			}
 
 			updateCurrentClient.realtorsWorkedWith.push(addToRealtorHistory)
@@ -259,7 +262,12 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 
 			res.status(200).json({
 				data: {
-					terminatedRealtorContactInfo: updatedRealtor.contactInfo
+					terminatedRealtorContactInfo: {
+						firstName: updatedRealtor.firstName,
+						lastName: updatedRealtor.lastName,
+						phoneNumber: updatedRealtor.phoneNumber, 
+						email: updatedRealtor.email
+					}
 				},
 				message: "Terminated Contract with Realtor.",
 				status: 200

@@ -36,7 +36,10 @@ router.post('/register', async (req, res, next) => {
 		 		brokerLicenseNumber: licenseNumber,
 		 		password: desiredPassword,
 		 		company: req.body.company,
-				contactInfo: req.body.contactInfo,
+				firstName: req.body.firstName,
+				lastName: req.body.lastName,
+				phoneNumber: req.body.phoneNumber,
+				email: req.body.email,
 				websiteURL: req.body.websiteURL
 		 		// Should broker have recovery info like Client?
 		 		// recoveryQuestion: [req.body.recoveryQuestion],

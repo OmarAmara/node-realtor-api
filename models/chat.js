@@ -31,6 +31,7 @@ const chatSchema = mongoose.Schema({
 			default: Date.now(),
 			required: true
 		},
+		// Can this be changed to id of sender?
 		// Determines which User "Owns" the message
 		isSenderClient: Boolean,
 		// is this necessary for now?

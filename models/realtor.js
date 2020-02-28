@@ -38,24 +38,22 @@ const realtorSchema = mongoose.Schema({
 			required: true
 		}
 	},
-	contactInfo: {
-		firstName: {
-			type: String,
-			required: true
-		},
-		lastName: {
-			type: String,
-			required: true
-		},
-		phoneNumber: {
-			type: String,
-			minlength: 10,
-			required: true
-		},
-		email: {
-			type: String,
-			required: true
-		}
+	firstName: {
+		type: String,
+		required: true
+	},
+	lastName: {
+		type: String,
+		required: true
+	},
+	phoneNumber: {
+		type: String,
+		minlength: 10,
+		required: true
+	},
+	email: {
+		type: String,
+		required: true
 	},
 	brokerLicenseNumber: {
 		type: String,
