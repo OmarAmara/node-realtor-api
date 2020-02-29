@@ -32,15 +32,7 @@ router.post('/register', async (req, res, next) => {
 		 	const createdRealtor = await Realtor.create({
 		 		// GREAT PLACE TO USE SPREAD OPERATOR?
 		 		// ^^ Look at create Client comments to see how this may be implemented.
-		 		username: desiredUsername,
-		 		brokerLicenseNumber: licenseNumber,
-		 		password: desiredPassword,
-		 		company: req.body.company,
-				firstName: req.body.firstName,
-				lastName: req.body.lastName,
-				phoneNumber: req.body.phoneNumber,
-				email: req.body.email,
-				websiteURL: req.body.websiteURL
+				...req.body
 		 		// Should broker have recovery info like Client?
 		 		// recoveryQuestion: [req.body.recoveryQuestion],
 		 		// recoveryAnswer: req.body.recoveryAnswer,

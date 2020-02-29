@@ -31,7 +31,7 @@ const clientSchema = mongoose.Schema({
 		enum: [
 			"Where were you born?",
 			"What is your mother's maiden name?",
-			"Which elementary Schoold did you graduate from?"
+			"Which elementary school did you attend?"
 		],
 		required: true
 	},

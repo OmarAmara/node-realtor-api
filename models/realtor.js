@@ -6,37 +6,33 @@ const realtorSchema = mongoose.Schema({
 		trim: true,
 		lowercase: true
 	},
-	company: {
-		name: {
-			type: String,
-			required: true
-		},
-		location: {
-			street1: {
-				type: String
-				//, required: true
-			},
-			street2: {
-				type: String
-			},
-			city: {
-				type: String,
-				required: true
-			},
-			state: {
-				type: String,
-				required: true
-			},
-			zipcode: {
-				type: String,
-				required: true
-			}
-		},
-		phone: {
-			type: String,
-			minlength: 10,
-			required: true
-		}
+	companyName: {
+		type: String,
+		required: true
+	},
+	street1: {
+		type: String
+		//, required: true
+	},
+	street2: {
+		type: String
+	},
+	city: {
+		type: String,
+		required: true
+	},
+	state: {
+		type: String,
+		required: true
+	},
+	zipcode: {
+		type: String,
+		required: true
+	},
+	companyPhone: {
+		type: String,
+		minlength: 11,
+		required: true
 	},
 	firstName: {
 		type: String,
