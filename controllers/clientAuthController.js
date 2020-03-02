@@ -11,8 +11,12 @@ const Realtor = require('../models/realtor')
 /* -- Client ROUTES -- */
 
 // test route
-router.get('/', async (req, res, next) => {
-	res.json(data={ greet: 'hello' })
+router.get('/test', async (req, res, next) => {
+	res.json({
+		data:{},
+		message: "Hello",
+		status: 200
+	})
 })
 
 
@@ -101,13 +105,18 @@ router.post('/login', async (req, res, next) => {
 	}
 })
 
-
+// Should this be placed in server.js?
 // Logout Client Route
 router.get('/logout', async (req, res, next) => {
 	try {
 		await req.session.destroy()
 
-		res.json("Client Successfully Logged Out")
+		res.status(200).json({
+			data: {},
+			//Should not be viewable as 204 sends no content
+			message: "Client Successfully Logged Out",
+			status: 200
+		})
 	} catch(err) {
 		next(err)
 	}

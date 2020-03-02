@@ -90,12 +90,19 @@ router.post('/login', async (req, res, next) => {
 	}	
 })
 
+
+// Should this be placed in server.js?
 // Logout Realtor Route
 router.get('/logout', async (req, res, next) => {
 	try {
 		await req.session.destroy()
 
-		res.json("Realtor Successfully Logged Out")
+		res.status(200).json({
+			data: {},
+			//Should not be viewable as 204 sends no content
+			message: "Realtor Successfully Logged Out",
+			status: 200
+		})
 	} catch(err) {
 		next(err)
 	}

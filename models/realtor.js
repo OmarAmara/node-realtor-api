@@ -31,7 +31,8 @@ const realtorSchema = mongoose.Schema({
 	},
 	companyPhone: {
 		type: String,
-		minlength: 11,
+		minlength: 10,
+		maxlength: 12,
 		required: true
 	},
 	firstName: {
@@ -45,6 +46,7 @@ const realtorSchema = mongoose.Schema({
 	phoneNumber: {
 		type: String,
 		minlength: 10,
+		maxlength: 12,
 		required: true
 	},
 	email: {
