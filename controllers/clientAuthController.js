@@ -142,7 +142,6 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 			})
 
 			await oldRealtor.save()
-
 		}
 
 		const foundRealtor = await Realtor.findById(req.params.realtorId)
@@ -215,14 +214,9 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 
 // Terminate Realtor/Client Relationship
 router.put('/terminate/:clientId', async (req, res, next) => {
-	await terminateRelationship(req, res, next, req.params.clientId)
-})
-
-const terminateRelationship = async (req, res, next, clientId) => {
-	console.log('\n\nHello')
 	// need to send clientId
 	try {
-		const updatedClient = await Client.findById(clientId)
+		const updatedClient = await Client.findById(req.params.clientId)
 		// find realtor to update from client query. Helpful since client can only have one realtor.
 
 		const updatedRealtor = await Realtor.findById(updatedClient.currentRealtor[0]._id.toString())
@@ -231,7 +225,7 @@ const terminateRelationship = async (req, res, next, clientId) => {
 		if(req.session.isClient === false && updatedClient.currentRealtor[0]._id.toString() === req.session.loggedInUser._id) {
 
 			// Loop through realtor's client list to check if logged in realtor is contracted with client
-			const isAClient = req.session.loggedInUser.clients.some(client => client._id === clientId)
+			const isAClient = req.session.loggedInUser.clients.some(client => client._id === req.params.clientId)
 
 			// if client was found in realtor's client list
 			if(isAClient) {
@@ -241,7 +235,7 @@ const terminateRelationship = async (req, res, next, clientId) => {
 
 				// remove client from realtor's clients list
 				updatedRealtor.clients.forEach((client, key) => {
-					if(client._id === clientId) {
+					if(client._id === req.params.clientId) {
 
 						// removes object in this position of array
 						updatedRealtor.clients.splice(key, 1)
@@ -276,12 +270,12 @@ const terminateRelationship = async (req, res, next, clientId) => {
 			}
 
 		// If loggedInUser is the Client terminating contract	
-		} else if(req.session.loggedInUser._id === clientId && req.session.loggedInUser.currentRealtor.length > 0) {
+		} else if(req.session.loggedInUser._id === req.params.clientId && req.session.loggedInUser.currentRealtor.length > 0) {
 			updatedClient.currentRealtor = []
 
 			// remove client from realtor's clients list
 			updatedRealtor.clients.forEach((client, key) => {
-				if(client._id === clientId) {
+				if(client._id === req.params.clientId) {
 
 					// removes object in this position of array
 					updatedRealtor.clients.splice(key, 1)
@@ -318,6 +312,6 @@ const terminateRelationship = async (req, res, next, clientId) => {
 	} catch(err) {
 		next(err)
 	}
-}
+})
 
 module.exports = router

@@ -89,7 +89,7 @@ router.post('/messages/:chatId', async (req, res, next) => {
 })
 
 
-// Delete Chat Message Route
+// Delete Message (in Chat) Route
 router.delete('/:chatId/:messageId', async (req, res, next) => {
 	try {
 		const foundChat = await Chat.findById(req.params.chatId)
@@ -144,7 +144,7 @@ router.delete('/:chatId/:messageId', async (req, res, next) => {
 })
 
 
-// Create Chat thread Route
+// Create Chat thread Route (only clients can start a conversation)
 router.post('/:realtorId', isClientAuth, async (req, res, next) => {
 	try {
 		const convoWithRealtor = await Chat.find({ $and: [{client: req.session.loggedInUser._id, realtor: req.params.realtorId}] }).populate('client').populate('realtor')
