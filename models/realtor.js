@@ -67,7 +67,12 @@ const realtorSchema = mongoose.Schema({
 	password: {
 		type: String,
 		required: true
-	}
+	},
+	createdOn: {
+		type: Date,
+		default: Date.now(),
+		required: true
+	},
 })
 
 const Realtor = mongoose.model('Realtor', realtorSchema)

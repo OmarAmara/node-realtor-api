@@ -128,6 +128,23 @@ router.get('/logout', async (req, res, next) => {
 //** Also add so that changing realtor will place client(IN REALTOR USER) in Realtor's clientHistory
 router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 	try {
+		if(req.session.loggedInUser.currentRealtor.length > 0) {
+			const oldRealtor = await Realtor.findById(req.session.loggedInUser.currentRealtor[0]._id.toString())
+
+				// remove client from realtor's clients list
+			oldRealtor.clients.forEach((client, key) => {
+				if(client._id === req.session.loggedInUser._id) {
+
+					// removes object in this position of array
+					oldRealtor.clients.splice(key, 1)
+					oldRealtor.clientHistory.push(client)
+				}
+			})
+
+			await oldRealtor.save()
+
+		}
+
 		const foundRealtor = await Realtor.findById(req.params.realtorId)
 
 		// searches realtor's client list to see if loggedInUser is existing client
@@ -144,7 +161,8 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 				_id: req.session.loggedInUser._id,
 				email: req.session.loggedInUser.email,
 				firstName: req.session.loggedInUser.firstName,
-				lastName: req.session.loggedInUser.lastName
+				lastName: req.session.loggedInUser.lastName,
+				terminatedContractOn: Date.now()
 			}
 
 			foundRealtor.clients.push(client)
@@ -197,16 +215,23 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 
 // Terminate Realtor/Client Relationship
 router.put('/terminate/:clientId', async (req, res, next) => {
+	await terminateRelationship(req, res, next, req.params.clientId)
+})
+
+const terminateRelationship = async (req, res, next, clientId) => {
+	console.log('\n\nHello')
+	// need to send clientId
 	try {
-		const updatedClient = await Client.findById(req.params.clientId)
+		const updatedClient = await Client.findById(clientId)
 		// find realtor to update from client query. Helpful since client can only have one realtor.
+
 		const updatedRealtor = await Realtor.findById(updatedClient.currentRealtor[0]._id.toString())
 
 		// if logged in User is a Realtor and if retrieved client's realtor is logged in realtor
 		if(req.session.isClient === false && updatedClient.currentRealtor[0]._id.toString() === req.session.loggedInUser._id) {
 
 			// Loop through realtor's client list to check if logged in realtor is contracted with client
-			const isAClient = req.session.loggedInUser.clients.some(client => client._id === req.params.clientId)
+			const isAClient = req.session.loggedInUser.clients.some(client => client._id === clientId)
 
 			// if client was found in realtor's client list
 			if(isAClient) {
@@ -216,7 +241,7 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 
 				// remove client from realtor's clients list
 				updatedRealtor.clients.forEach((client, key) => {
-					if(client._id === req.params.clientId) {
+					if(client._id === clientId) {
 
 						// removes object in this position of array
 						updatedRealtor.clients.splice(key, 1)
@@ -251,12 +276,12 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 			}
 
 		// If loggedInUser is the Client terminating contract	
-		} else if(req.session.loggedInUser._id === req.params.clientId) {
+		} else if(req.session.loggedInUser._id === clientId && req.session.loggedInUser.currentRealtor.length > 0) {
 			updatedClient.currentRealtor = []
 
 			// remove client from realtor's clients list
 			updatedRealtor.clients.forEach((client, key) => {
-				if(client._id === req.params.clientId) {
+				if(client._id === clientId) {
 
 					// removes object in this position of array
 					updatedRealtor.clients.splice(key, 1)
@@ -293,8 +318,6 @@ router.put('/terminate/:clientId', async (req, res, next) => {
 	} catch(err) {
 		next(err)
 	}
-})
-
-
+}
 
 module.exports = router

@@ -3,6 +3,10 @@ require('dotenv').config()
 require('./db/db.js')
 const express = require('express')
 const cors = require('cors')
+const corsOptions = {
+	origin: 'http://localhost:3000',
+	credentials: true
+}
 const app = express()
 // models
 const Client = require('./models/client')
@@ -18,7 +22,7 @@ const session = require('express-session')
 
 
 /* -- MIDDLEWARE -- */
-app.use(cors())
+app.use(cors(corsOptions))
 app.use(bodyParser.urlencoded({ extended: false })) // request.body
 app.use(methodOverride('_method')) // necessary?
 app.use(express.json()) // utilize json data from request.body
