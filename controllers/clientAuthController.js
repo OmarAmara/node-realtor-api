@@ -75,7 +75,7 @@ router.post('/login', async (req, res, next) => {
 		const client = await Client.findOne({ email: req.body.email }).populate('currentRealtor._id')//'currentRealtor.contactInfo._id')
 
 		if(!client) {
-			res.json("Invalid Username or Password")
+			res.json("Invalid Email or Password")
 		} else {
 			// variable for bcrypt to compare to saves hashed password
 			if(client.password === req.body.password) {
@@ -93,7 +93,7 @@ router.post('/login', async (req, res, next) => {
 					status: 200
 				})
 			} else {
-				res.json("Invalid Username or Password")
+				res.json("Invalid Email or Password")
 			}
 		}
 	} catch(err) {

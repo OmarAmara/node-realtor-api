@@ -9,13 +9,13 @@ const Realtor = require('../models/realtor')
 // Register Realtor Route
 router.post('/register', async (req, res, next) => {
 	try {
-		const desiredUsername = req.body.username.toLowerCase()
+		const desiredEmail = req.body.email.toLowerCase()
 		const licenseNumber = req.body.brokerLicenseNumber
 		const desiredPassword = req.body.password
 
 		const realtorExists = await Realtor.findOne({
 		 	$or: [
-				{username: desiredUsername},
+				{email: desiredEmail},
 				{brokerLicenseNumber: licenseNumber}
 		 	]
 		})
@@ -24,7 +24,7 @@ router.post('/register', async (req, res, next) => {
 			// use req.body to keep casing
 			res.status(409).json({
 				data: {},
-				messgae: `Username: ${req.body.username} or Realtor Brokerage License Already Exists. Try a different Username or check License Number`,
+				messgae: `Email: ${req.body.email} or Realtor Brokerage License Already Exists. Try a different Email or check License Number`,
 				status: 409
 			})
 		} else {
@@ -59,10 +59,10 @@ router.post('/register', async (req, res, next) => {
 // Login Realtor Route
 router.post('/login', async (req, res, next) => {
 	try {
-		const realtor = await Realtor.findOne({ username: req.body.username.toLowerCase() })
+		const realtor = await Realtor.findOne({ email: req.body.email.toLowerCase() })
 
 		if(!realtor) {
-			res.json("Invalid Username or Password")
+			res.json("Invalid Email or Password")
 		} else {
 			// variable for bcrypt to compare to saves hashed password
 			console.log(realtor)
@@ -76,13 +76,13 @@ router.post('/login', async (req, res, next) => {
 				req.session.loggedInUser = realtor
 				req.session.isClient = false
 
-				res.status(201).json({
+				res.status(200).json({
 					data: realtor, 
 					message: "Realtor Successfully Logged In!", 
-					status: 201
+					status: 200
 				})
 			} else {
-				res.json("Invalid Username or Password")
+				res.json("Invalid Email or Password")
 			}
 		}
 	} catch(err) {
@@ -102,10 +102,27 @@ router.get('/logout', async (req, res, next) => {
 })
 
 
-//CLIENT SEARCH INDEX WILL GO HERE//:
-//// Is this necessary or can we just utilize what we have available in session?
-// can we access session on front-end? Aside from using it as logic in back-end routes.
+// Realtor Index
+router.get('/list', async (req, res, next) => {
+	try {
+		const realtors = await Realtor.find({})
 
+		realtors.forEach((realtor) => {
+			realtor.clients = null
+			realtor.clientHistory = null
+			realtor.password = null
+		})
+
+		res.status(200).json({
+			data: realtors,
+			message: `Retrieved ${realtors.length} Realtors.`,
+			status: 200
+		})
+
+	} catch(err) {
+		next(err)
+	}
+})
 
 
 module.exports = router

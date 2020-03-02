@@ -64,7 +64,7 @@ router.post('/index/:clientId', isRealtorAuth, async (req, res, next) => {
 	try{
 		const foundClient = await Client.findById(req.params.clientId)
 
-		if(req.session.isClient === false && foundClient.currentRealtor[0].username === req.session.loggedInUser.username) {
+		if(req.session.isClient === false && foundClient.currentRealtor[0].email === req.session.loggedInUser.email) {
 			// 
 			req.session.loggedInUser.clients.forEach(async(client, key) => {
 				if(client._id === req.params.clientId) {
