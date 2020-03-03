@@ -20,7 +20,7 @@ router.get('/', async (req, res, next) => {
 		if(req.session.isClient) {
 			const conversations = await Chat.find({
 				client: req.session.loggedInUser._id 
-			 }).populate('messages._id').populate('client').populate('realtor')
+			 }).populate('message').populate('client').populate('realtor')
 			//--> Front-end will have to loop all conversation and then messages!
 
 			// remove sensitive information
