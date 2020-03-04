@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 // DB MODELS --
 
 
-const mongodbURI = process.env.MONGODB_URI
+const mongodbURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/realtor-app'
 
 mongoose.connect(mongodbURI, {
 	useNewUrlParser: true,
