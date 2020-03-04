@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const bcrypt = require('bcryptjs')
 // custom middleware
 const isClientAuth = require('../lib/isClientAuth')
 
@@ -40,13 +41,16 @@ router.post('/register', async (req, res, next) => {
 
 		} else {
 		 	// should be hashing password here
+			const salt = bcrypt.genSaltSync(10) // salt value >10
+			const hashedPassword = bcrypt.hashSync(desiredPassword, salt)
+
 		 	const createdClient = await Client.create({
 		 		// TEST THIS POSSIBILITY OF SPREAD:(comment out remainder of create body)
 		 		//req.body.password, req.body.recoveryQuestion...req.body, password: desiredPassword, recoveryQuestion: [`${req.body.recoveryQuestion}`]
 		 		// ^^ This or something similar should exclude pwd & recoveryQuestion from req.body, then add them
 		 		email: desiredEmail,
 		 		username: desiredUsername,
-		 		password: desiredPassword,
+		 		password: hashedPassword,
 		 		firstName: req.body.firstName,
 		 		lastName: req.body.lastName,
 		 		// this portion will change when front end utilizes drop down of three options in model.
@@ -82,7 +86,7 @@ router.post('/login', async (req, res, next) => {
 			res.json("Invalid Email or Password")
 		} else {
 			// variable for bcrypt to compare to saves hashed password
-			if(client.password === req.body.password) {
+			if(bcrypt.compareSync(req.body.password, client.password)) {
 				client.password = null
 				client.recoveryQuestion = null
 				client.recoveryAnswer = null
@@ -202,7 +206,7 @@ router.put('/contract/:realtorId', isClientAuth, async (req, res, next) => {
 		} else{
 			res.status(400).json({
 				data: {},
-				message: "Client already contracted with Realtor",//`Client is already contracted with Realtor ${req.session.loggedInUser.currentRealtor[0].contactInfo.firstName + ` ` + req.session.loggedInUser.currentRealtor[0].contactInfo.lastName}. Are you trying to switch realtors? You can contact ${req.session.loggedInUser.currentRealtor[0].contactInfo.firstName} at ${req.session.loggedInUser.currentRealtor[0].contactInfo.email} or feel free to contact support at thereIs@noSupport.com`,
+				message: "Client already contracted with Realtor",
 				status: 400
 			})
 		}

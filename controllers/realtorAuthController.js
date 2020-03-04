@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const bcrypt = require('bcryptjs')
 // models
 const Realtor = require('../models/realtor')
 const Client = require('../models/client')
@@ -29,11 +30,13 @@ router.post('/register', async (req, res, next) => {
 				status: 409
 			})
 		} else {
+			const salt = bcrypt.genSaltSync(10) //// salt value >10?
+			const hashedPassword = bcrypt.hashSync(desiredPassword, salt)
 		 	// should be hashing password here
 		 	const createdRealtor = await Realtor.create({
 		 		// GREAT PLACE TO USE SPREAD OPERATOR?
 		 		// ^^ Look at create Client comments to see how this may be implemented.
-				...req.body
+				...req.body,password: hashedPassword
 		 		// Should broker have recovery info like Client?
 		 		// recoveryQuestion: [req.body.recoveryQuestion],
 		 		// recoveryAnswer: req.body.recoveryAnswer,
@@ -68,7 +71,8 @@ router.post('/login', async (req, res, next) => {
 			// variable for bcrypt to compare to saves hashed password
 			console.log(realtor)
 			// const data = {realtorId: realtor.id, company: realtor.company, contactInfo: realtor.contactInfo, clients: realtor.clients, username: realtor.username, websiteURL: realtor.websiteURL, brokerLicenseNumber: realtor.brokerLicenseNumber}
-			if(realtor.password === req.body.password) {
+			if(bcrypt.compareSync(req.body.password, realtor.password)) {
+		
 				// spread destructorer, but gives too much info
 				// const { password, ...noPassword } = realtor console.log(noPassword)
 				realtor.password = null
@@ -140,7 +144,6 @@ router.get('/client-list', async (req, res, next) => {
 		const currentClients = []
 		for(let i = 0; i < foundRealtor.clients.length; i++) {
 			let foundClient = await Client.findById(foundRealtor.clients[i]._id)
-			foundClient.currentRealtor = null
 			foundClient.realtorsWorkedWith = null
 			foundClient.password = null
 			foundClient.recoveryAnswer = null
