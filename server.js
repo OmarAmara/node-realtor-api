@@ -4,7 +4,7 @@ require('./db/db.js')
 const express = require('express')
 const cors = require('cors')
 const corsOptions = {
-	origin: ['http://localhost:3000', 'https://restate-react.herokuapp.com/'],
+	origin: ['http://localhost:3000', 'https://restate-react.herokuapp.com'],
 	credentials: true
 }
 const app = express()
