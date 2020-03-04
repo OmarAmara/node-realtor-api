@@ -39,7 +39,7 @@ router.get('/', async (req, res, next) => {
 		} else {
 			const conversations = await Chat.find({
 				realtor: req.session.loggedInUser._id
-			}).populate('messages._id').populate('client').populate('realtor')
+			}).populate('message').populate('client').populate('realtor')
 			// remove sensitive information
 			conversations.forEach((convo)=>{
 				convo.client.password = null

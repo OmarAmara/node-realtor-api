@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 // models
 const Realtor = require('../models/realtor')
+const Client = require('../models/client')
 
 
 /* -- Realtor ROUTES -- */
@@ -125,6 +126,33 @@ router.get('/list', async (req, res, next) => {
 			message: `Retrieved ${realtors.length} Realtors.`,
 			status: 200
 		})
+
+	} catch(err) {
+		next(err)
+	}
+})
+
+router.get('/client-list', async (req, res, next) => {
+	try {
+		const foundRealtor = await Realtor.findById(req.session.loggedInUser._id)
+		 // const realtorClients = await Client.find({"currentRealtor" : [ {  "_id" : req.session.loggedInUser._id }]})
+
+		const currentClients = []
+		for(let i = 0; i < foundRealtor.clients.length; i++) {
+			let foundClient = await Client.findById(foundRealtor.clients[i]._id)
+			foundClient.currentRealtor = null
+			foundClient.realtorsWorkedWith = null
+			foundClient.password = null
+			foundClient.recoveryAnswer = null
+			foundClient.recoveryQuestion = null
+			currentClients.push(foundClient)
+		}
+
+		 res.status(200).json({
+		 	data: currentClients,
+		 	message: `Retrieved ${currentClients.length} Clients.`,
+		 	status: 200
+		 })
 
 	} catch(err) {
 		next(err)
