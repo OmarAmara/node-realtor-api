@@ -72,7 +72,7 @@ app.get('*', (req, res) => {
 })
 
 /* -- LISTENER -- */
-app.listen(PORT, () => {
+app.listen(PORT || 3030, () => {
 	const d = new Date
 	console.log(`\n${d} Server running on port: ${PORT}`);
 })
